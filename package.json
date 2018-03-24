@@ -1,0 +1,27 @@
+{
+  "name": "jsonapi-orchestrator",
+  "version": "0.0.1",
+  "description": "Jsonapi powered framework to harness the power of jsonapi with redux",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MyJobGlasses/jsonapi-orchestrator.git"
+  },
+  "keywords": [
+    "redux",
+    "jsonapi"
+  ],
+  "author": "My Job Glasses",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MyJobGlasses/jsonapi-orchestrator/issues"
+  },
+  "homepage": "https://github.com/MyJobGlasses/jsonapi-orchestrator#readme",
+  "dependencies": {
+    "redux": "^3.7.2",
+    "redux-saga": "^0.16.0"
+  }
+}
