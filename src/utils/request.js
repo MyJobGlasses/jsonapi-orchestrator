@@ -1,3 +1,5 @@
+import normalize from 'json-api-normalizer';
+
 /**
  * Handle HTTP methods
  * @param {Object} response
@@ -13,15 +15,28 @@ const checkStatus = (response) => {
 };
 
 /**
+ * Handle response and parse as JSON
+ * @param {Object} response
+ */
+export const parseJSON = response => response
+  .json()
+  .catch(e => console.log('parse error', e));
+
+/**
  *
  * @param {String} url
  * @param {Object} data
  * @param {Object} [options] - Options of the request
  *    @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters
+ * @returns {Promise}
  */
-const performRequest = (url, data, options = {}) => {
+const performRequest = (url, data, options = {}) => new Promise((resolve, reject) => {
   window.fetch(url, options)
-    .then(checkStatus);
-};
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(response => normalize(response, { endpoint: url }))
+    .then(resolve)
+    .catch(reject);
+});
 
 export default performRequest;

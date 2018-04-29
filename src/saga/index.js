@@ -1,8 +1,8 @@
 import { all, fork } from 'redux-saga/effects';
-import watchUpdateRequest from './update';
+import watchReadListRessource from './readlist';
 
 export default function* root() {
   yield all([
-    fork(watchUpdateRequest),
+    fork(watchReadListRessource),
   ]);
 }

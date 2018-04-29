@@ -15,6 +15,15 @@ export const generateActionType = (method, resource) => `@@api/${method.toUpperC
  * @example generateActionType('update', 'blog/article') =
  *  '@@api/UPDATE_RESOURCE_BLOG_ARTICLE_SUCCESS';
  */
+export const generateActionTypeRequest = (method, resource) => `${generateActionType(method, resource)}_REQUEST`;
+
+/**
+ * Action type dispatched on request perform with success
+ * @param {String} method - Will be uppercased for the action
+ * @param {String} resource - Will be underscored and uppercased
+ * @example generateActionType('update', 'blog/article') =
+ *  '@@api/UPDATE_RESOURCE_BLOG_ARTICLE_SUCCESS';
+ */
 export const generateActionTypeSuccess = (method, resource) => `${generateActionType(method, resource)}_SUCCESS`;
 
 /**
