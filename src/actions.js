@@ -1,3 +1,4 @@
+// @flow
 import {
   generateActionTypeSuccess,
   generateActionTypeRequest,
@@ -11,7 +12,7 @@ import {
  * @param {String} params.url - endpoint on which request resource
  * @param {String} params.type - type of the requested ressource
  */
-export const generateAction = (method, resource, params = {}) => {
+export const generateAction = (method: string, resource: string, params: {} = {}) => {
   if (!('url' in params)) {
     throw new Error('All actions must implement url param');
   }
@@ -31,7 +32,7 @@ export const generateAction = (method, resource, params = {}) => {
  * @param {String} params.url - endpoint on which request resource
  * @param {String} params.type - type of the requested ressource
  */
-export const generateActionReadList = (resource, params = {}) =>
+export const generateActionReadList = (resource: string, params: {} = {}) =>
   generateAction('read_list', resource, params);
 
 /**
@@ -42,7 +43,7 @@ export const generateActionReadList = (resource, params = {}) =>
  * @param {String} params.url - endpoint on which request resource
  * @param {String} params.type - type of the requested ressource
  */
-export const generateSuccessAction = (method, resource, payload) => ({
+export const generateSuccessAction = (method: string, resource: string, payload: {}) => ({
   type: generateActionTypeSuccess(method, resource),
   payload,
 });
