@@ -5,7 +5,7 @@ import performRequest from '../utils/request';
 import { getMainConnector } from '../JsonApiConnector';
 
 function* performReadListRequest(data) {
-  const payload = yield call(performRequest, getMainConnector().url + data.url);
+  const payload = yield call(performRequest, getMainConnector().url + data.resourceUri);
   yield put(generateSuccessAction('read_list', data.requestData.type, payload));
 }
 

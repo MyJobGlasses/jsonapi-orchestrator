@@ -13,7 +13,7 @@ import {
  * @param {String} params.type - type of the requested ressource
  */
 export const generateAction = (method: string, resource: string, params: {} = {}) => {
-  if (!('url' in params)) {
+  if (!('resourceUri' in params)) {
     throw new Error('All actions must implement url param');
   }
   return {
