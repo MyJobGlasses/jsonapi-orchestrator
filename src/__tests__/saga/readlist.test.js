@@ -13,23 +13,21 @@ describe('#readlist', () => {
     window.fetch = jest.fn(() => Promise.resolve({ status: 200 }));
   });
 
-  test('can properly perform request when action', () => {
-    return expectSaga(watchReadListRessource)
-      .dispatch({
-        type: '@@api/READ_LIST_RESOURCE_MONSTER_BEAR_REQUEST',
-        resourceUri: 'monster/bear',
-        requestData: {
-          type: 'monster/bear',
-        },
-      })
-      .provide([
-        [matchers.call.fn(performRequest), {}],
-      ])
-      .put.like({
-        action: {
-          type: '@@api/READ_LIST_RESOURCE_MONSTER_BEAR_SUCCESS',
-        },
-      })
-      .silentRun();
-  });
+  test('can properly perform request when action', () => expectSaga(watchReadListRessource)
+    .dispatch({
+      type: '@@api/READ_LIST_RESOURCE_MONSTER_BEAR_REQUEST',
+      resourceUri: 'monster/bear',
+      requestData: {
+        type: 'monster/bear',
+      },
+    })
+    .provide([
+      [matchers.call.fn(performRequest), {}],
+    ])
+    .put.like({
+      action: {
+        type: '@@api/READ_LIST_RESOURCE_MONSTER_BEAR_SUCCESS',
+      },
+    })
+    .silentRun());
 });
