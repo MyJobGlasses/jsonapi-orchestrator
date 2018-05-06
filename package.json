@@ -22,6 +22,7 @@
   "homepage": "https://github.com/MyJobGlasses/jsonapi-orchestrator#readme",
   "dependencies": {
     "json-api-normalizer": "^0.4.10",
+    "lodash": "^4.17.10",
     "redux": "^3.7.2",
     "redux-saga": "^0.16.0"
   },
