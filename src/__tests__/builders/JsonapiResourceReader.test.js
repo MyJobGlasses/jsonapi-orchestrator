@@ -11,33 +11,48 @@ describe('JsonapiResourceReader', () => {
       test('merges appropriately nested sortings', () => {
         // ?sort=-educations.school.name
         instance.sort({ educations: { school: { name: 'desc'} } });
-        expect(instance._flattenSortings())
+        expect(instance.joinedSortings())
           .toBe('-educations.school.name');
       });
 
       test('concatenates sortings in the order they were defined', () => {
-        // ?sort=-positive_like_count,company_name
-        instance.sort({ positive_like_count: 'desc'}, { company_name: 'asc'});
-        expect(instance._flattenSortings())
-          .toBe('-positive_like_count,company_name');
+        // ?sort=-positivelikecount,companyname
+        instance.sort({ positivelikecount: 'desc'}, { companyname: 'asc'});
+        expect(instance.joinedSortings())
+          .toBe('-positivelikecount,companyname');
       });
     });
   });
 
   describe('filtering', () => {
     describe('flattens filters for request', () => {
-      test('merges appropriately filters', () => {
-        // ?filter[company_name]=air_france,axa]
-        instance.filter({ company_name: ['air_france', 'axa'] });
-        expect(instance._flattenFilters())
-          .toBe('filter[company_name]=air_france,axa');
+      test('merges appropriately nested filters', () => {
+        // ?filter[companyname]=airfrance,axa]
+        instance.filter({ companyname: ['airfrance', 'axa'] });
+        expect(instance.mapOfJoinedFilters())
+          .toEqual(expect.objectContaining({
+            'filter[companyname]': 'airfrance,axa'
+          }));
       });
 
       test('handles nested filters', () => {
-        // ?filter[company][name]=air_france,axa]
-        instance.filter({ company: { name: ['air_france', 'axa'] } });
-        expect(instance._flattenFilters())
-          .toBe('filter[company][name]=air_france,axa');
+        // ?filter[company][name]=airfrance,axa]
+        instance.filter({ company: { name: ['airfrance', 'axa'] } });
+        expect(instance.mapOfJoinedFilters())
+          .toEqual(expect.objectContaining({
+            'filter[company][name]': 'airfrance,axa'
+          }));
+      });
+
+      test('handles multiple filters', () => {
+        // ?filter[company][name]=airfrance,axa]
+        instance.filter({ company: { name: ['air france', 'axa'] } });
+        instance.filter({ company: { sector: ['it, digital', 'business'] } });
+        expect(instance.mapOfJoinedFilters())
+          .toEqual(expect.objectContaining({
+            'filter[company][name]': 'air%20france,axa',
+            'filter[company][sector]': 'it%2C%20digital,business'
+          }));
       });
     });
   });
@@ -47,29 +62,43 @@ describe('JsonapiResourceReader', () => {
 
       test('merges appropriately single nested routes into a single string', () => {
         instance.sideload({ profiles: { user: true } });
-        expect(instance._flattenSideloads())
+        expect(instance.joinedSideloads())
           .toBe('profiles.user');
       });
 
       test('duplicates forking sideloading routes into multiple strings', () => {
         instance.sideload({ avatar: true, profiles: { user: true } });
-        expect(instance._flattenSideloads())
+        expect(instance.joinedSideloads())
           .toBe('avatar,profiles.user');
       });
 
       test('merges multiple distinct sideloads', () => {
         instance.sideload({ avatar: true });
         instance.sideload({ profiles: { user: true } });
-        expect(instance._flattenSideloads())
+        expect(instance.joinedSideloads())
           .toBe('avatar,profiles.user');
       });
 
       test('merges multiple sideloads sharing common path', () => {
         instance.sideload({ profiles: { user: true } });
         instance.sideload({ profiles: { user: { organization: true } } });
-        expect(instance._flattenSideloads())
+        expect(instance.joinedSideloads())
           .toBe('profiles.user.organization');
       });
+    });
+  });
+
+  describe('parameterization', () => {
+    test('aggregates all params for a request', () => {
+      instance.sideload({ school: true });
+      instance.filter({ companyname: ['airfrance', 'axa'] });
+      instance.sort({ companyname: 'desc' });
+
+      expect(instance.paramsAsObject()).toEqual(expect.objectContaining({
+        sort: '-companyname',
+        'filter[companyname]': 'airfrance,axa',
+        include: 'school',
+      }));
     });
   });
 });

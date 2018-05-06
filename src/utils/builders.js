@@ -1,4 +1,4 @@
-import { flatten, isObject, isArray, isString } from 'lodash';
+import { flatten, isObject, isArray, isString, isBoolean } from 'lodash';
 
 /* Resolve path dulications of sideloadings, and make an array that is very easy to merge for json:api compliance
  *
@@ -45,8 +45,8 @@ export const splatSideloads = (startingSideloadPath = '', nestedSideloads = {}) 
  *     ['mainProfile[user][notifications][newsletter]', [true]
  *    ]
  */
-export const splatFilters = (startingFilterPath = '', nestedFilters = {}, recursiveCall = false) => {
-  const currentFilters = [];
+export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
+  let currentFilters = [];
   Object.keys(nestedFilters).forEach( (nestedKey) => {
     const currentFilterValue = nestedFilters[nestedKey];
     let currentFilterPath;
@@ -56,8 +56,8 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}, recurs
       currentFilterPath = `${startingFilterPath}[${nestedKey}]`;
     }
     if (isObject(currentFilterValue) && !isArray(currentFilterValue)) {
-      currentFilters.push(splatFilters(currentFilterPath, currentFilterValue, true));
-    } else if (isString(currentFilterValue) || isArray(currentFilterValue)) {
+      currentFilters = currentFilters.concat(splatFilters(currentFilterPath, currentFilterValue, true));
+    } else if (isString(currentFilterValue) || isArray(currentFilterValue) || isBoolean(currentFilterValue)) {
       currentFilters.push([
         currentFilterPath,
         isArray(currentFilterValue) ? currentFilterValue : [currentFilterValue]
@@ -66,7 +66,6 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}, recurs
       throw new Error(`Filtering only accepts nested objects or strings or arrays as Filters, but received ${currentFilterValue}`)
     }
   });
-  if (recursiveCall) { return flatten(currentFilters) }
   return currentFilters;
 };
 

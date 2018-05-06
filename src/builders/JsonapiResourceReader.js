@@ -5,7 +5,7 @@ import { splatSideloads, splatSortings, splatFilters } from '../utils/builders';
 
 export default class JsonapiResourceReader {
   constructor(args = {}) {
-    // super(args);
+    // super(args); // Some weird bug when inheriting from JsonapiResourceBuilder
     const { sideloads = {}, sortings = [], filters = {}, dataMustBeFresherThan = null } = args;
     this.sideloads = sideloads;
     this.sortings = sortings;
@@ -13,7 +13,9 @@ export default class JsonapiResourceReader {
     this.dataMustBeFresherThan = dataMustBeFresherThan;
   }
 
-  /* Cache expiration */
+  /*
+   *** Cache expiration ***
+   */
 
   dataMustBeFresh() {
     this.dataMustBeFresherThan(new Date());
@@ -25,35 +27,76 @@ export default class JsonapiResourceReader {
 
   dataMustBeFresherThan(date) {
     this.mustBeFresherThan = date;
-  } // If we want to ensure data is fresher than
+  }
 
-  /* Sorting & Filtering */
+  /*
+   *** Sorting & Filtering ***
+   */
 
+  /* @param {Iterable<Object>} sortings - as many objects as you want, in sort order,
+   *   the end values must be either 'asc' or 'desc'
+   *
+   * @example sort({ company: { name: 'asc' } }, { rating: 'desc' })
+   *   # => will remember sorting
+   *        - FIRST on company.name (asc assumed to mean Alphabetically)
+   *        - SECOND on rating (desc assumed to mean best-rated first)
+   */
   sort(...sortings) {
     this.sortings = this.sortings.concat(sortings);
   }
 
+  /* @param filters {Object} filters - List of filters to be applied
+   *   - values can be either String, Boolean or Arrays
+   *
+   * @example filter({ company_name: ['axa', 'air france'], sector: 'it, digital', published: true]})
+   *   # => Will remember filtering on
+   *     - company_names either 'axa' or 'air france'
+   *     - sectors 'it, digital' (the ',' will be URLEncoded)
+   *     - published
+   *
+   */
   filter(filters) {
     this.filters = merge(this.filters, filters);
   }
 
   /* Sideloading via include */
 
-  sideload(sideloadHash) {
-    this.sideloads = merge(this.sideloads, sideloadHash);
+  /* @param sideloads {Object} sideloads - List of nested includes to request
+   *   - end values must be the Boolean true
+   *
+   * @example sideload({ company: true, user: { preferences: true } })
+   *   # => Will generate company and user.preferences
+   *
+   */
+  sideload(sideloads) {
+    this.sideloads = merge(this.sideloads, sideloads);
   }
 
-  _flattenSideloads() {
+  /* @param sideloads {Object} sideloads - List of nested includes to request
+   *   - end values must be the Boolean true
+   *
+   * @return {Object} containing key/values of params and values
+   *
+   */
+  paramsAsObject() {
+    return ({
+      sort: this.joinedSortings(),
+      include: this.joinedSideloads(),
+      ...this.mapOfJoinedFilters()
+    });
+  }
+
+  joinedSideloads() {
     return splatSideloads('', this.sideloads).join(',');
   }
 
-  _flattenSortings() {
+  joinedSortings() {
     return splatSortings(this.sortings).join(',');
   }
 
-  _flattenFilters() {
-    return splatFilters('', this.filters).map(
-      ([key, values]) => `${key}=${ values.map( (v) => encodeURIComponent(v)).join(',') }`
-    ).join(',');
+  mapOfJoinedFilters() {
+    return Object.assign(...splatFilters('', this.filters).map(
+      ([key, values]) => ({ [key]: values.map(v => encodeURIComponent(v)).join(',') }),
+    ));
   }
 }
