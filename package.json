@@ -24,7 +24,8 @@
     "json-api-normalizer": "^0.4.10",
     "lodash": "^4.17.10",
     "redux": "^3.7.2",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

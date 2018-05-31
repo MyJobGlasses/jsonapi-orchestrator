@@ -5,9 +5,13 @@ import { splatSideloads, splatSortings, splatFilters } from '../utils/builders';
 
 export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   constructor(args = {}) {
-    super({ ...args, method: (args.method || 'GET')  });
+    super(args);
 
-    const { sideloads = {}, sortings = [], filters = {}, dataMustBeFresherThan = null } = args;
+    const {
+      sideloads = {}, sortings = [], filters = {},
+      dataMustBeFresherThan = null,
+    } = args;
+
     this.sideloads = sideloads || {};
     this.sortings = sortings || []; // Ordered array
     this.filters = filters || {};

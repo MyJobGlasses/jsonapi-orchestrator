@@ -19,7 +19,7 @@ describe('JsonapiResourceReader', () => {
       expect(instance.sideloads).toEqual(expect.objectContaining({ messages: true }))
       expect(instance.sortings).toEqual(expect.objectContaining({ messages: { created_at: 'asc' }}))
       expect(instance.filters).toEqual(expect.objectContaining({ messages: { acknowledged: [true] }}))
-    })
+    });
   });
 
   describe('instances', () => {
