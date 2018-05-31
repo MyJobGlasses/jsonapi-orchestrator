@@ -82,7 +82,7 @@ describe('JsonapiRequestBuilder', () => {
           });
         });
 
-        test('returns a correct write action', () => {
+        test.skip('returns a correct write action', () => {
           expect(requestBuilder.action()).toMatchObject({
             type: 'CREATE_CONVERSATION_RESOURCE',
             data: {
