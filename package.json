@@ -4,6 +4,7 @@
   "description": "Jsonapi powered framework to harness the power of jsonapi with redux",
   "main": "src/index.js",
   "scripts": {
+    "test-ci": "jest --notify",
     "test": "jest --notify --watch"
   },
   "repository": {
