@@ -64,7 +64,7 @@ describe('JsonapiRequestBuilder', () => {
         beforeEach(() => {
           const conversationResource = new JsonapiResourceWriter({
             jsonapiType: 'conversation',
-            params: { id: 'cafebabe' },
+            params: { userid: 'cafebabe' },
             attributes: {
               recipient: 'deadbeef',
             },
@@ -76,34 +76,35 @@ describe('JsonapiRequestBuilder', () => {
               clientId: '0ff1ce',
             },
           });
-          conversationResource.sidepost({ messages: [messageResource] });
+          conversationResource.sidepost('messages', [messageResource]);
           requestBuilder = new JsonapiRequestBuilder({
-            resource: conversationResource, method: 'OPTIONS', path: '/conversations',
+            resource: conversationResource, path: '/conversations',
           });
         });
 
-        test.skip('returns a correct write action', () => {
+        test('returns a correct write action', () => {
           expect(requestBuilder.action()).toMatchObject({
             type: 'CREATE_CONVERSATION_RESOURCE',
+            params: { userid: 'cafebabe' },
             data: {
               type: 'conversation',
               attributes: { recipient: 'deadbeef' },
               relationships: {
-                messages: [{
-                  type: 'message',
-                  method: 'create',
-                  'temp-id': expect.any(String),
-                }],
+                messages: {
+                  data: [{
+                    type: 'message',
+                    method: 'create',
+                    'temp-id': expect.any(String),
+                  }],
+                },
               },
             },
             included: [{
               type: 'message',
               'temp-id': expect.any(String),
-              data: {
-                attributes: {
-                  text: 'Hello world !',
-                  clientId: '0ff1ce',
-                },
+              attributes: {
+                text: 'Hello world !',
+                clientId: '0ff1ce',
               },
             }],
           });

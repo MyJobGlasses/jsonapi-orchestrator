@@ -63,9 +63,21 @@ describe(JsonapiResourceWriter, () => {
           jsonapiType: 'message',
           attributes: { text: 'Magic World!' },
         });
+        const thirdMessageSidepost = new JsonapiResourceWriter({
+          jsonapiType: 'message',
+          attributes: { text: 'Fantastic World!' },
+        });;
 
-        test('merges appropriately singular sideposts', () => {
-          instance.sidepost({ messages: [messageSidepost] });
+        test('merges appropriately has-one sideposts', () => {
+          instance.sidepost('messages', messageSidepost);
+
+          expect(instance.sideposts).toMatchObject({
+            messages: messageSidepost,
+          });
+        });
+
+        test('merges appropriately has-many sideposts', () => {
+          instance.sidepost('messages', [messageSidepost]);
 
           expect(instance.sideposts).toMatchObject({
             messages: [messageSidepost],
@@ -73,11 +85,12 @@ describe(JsonapiResourceWriter, () => {
         });
 
         test('merges multiple sideposts on same relationship', () => {
-          instance.sidepost({ messages: [messageSidepost] });
-          instance.sidepost({ messages: [secondMessageSidepost] });
+
+          instance.sidepost('messages', [messageSidepost]);
+          instance.sidepost('messages', [secondMessageSidepost, thirdMessageSidepost]);
 
           expect(instance.sideposts).toMatchObject({
-            messages: [messageSidepost, secondMessageSidepost],
+            messages: [messageSidepost, secondMessageSidepost, thirdMessageSidepost],
           });
         });
       });
