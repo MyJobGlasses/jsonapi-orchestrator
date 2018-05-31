@@ -1,15 +1,16 @@
-import { merge } from 'lodash';
+import { merge, isEmpty } from 'lodash';
 
-import { JsonapiResourceBuilder } from './JsonapiResourceBuilder';
+import JsonapiResourceBuilder from './JsonapiResourceBuilder';
 import { splatSideloads, splatSortings, splatFilters } from '../utils/builders';
 
-export default class JsonapiResourceReader {
+export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   constructor(args = {}) {
-    // super(args); // Some weird bug when inheriting from JsonapiResourceBuilder
+    super({ ...args, method: (args.method || 'GET')  });
+
     const { sideloads = {}, sortings = [], filters = {}, dataMustBeFresherThan = null } = args;
-    this.sideloads = sideloads;
-    this.sortings = sortings;
-    this.filters = filters;
+    this.sideloads = sideloads || {};
+    this.sortings = sortings || []; // Ordered array
+    this.filters = filters || {};
     this.dataMustBeFresherThan = dataMustBeFresherThan;
   }
 
@@ -82,8 +83,25 @@ export default class JsonapiResourceReader {
     return ({
       sort: this.joinedSortings(),
       include: this.joinedSideloads(),
-      ...this.mapOfJoinedFilters()
+      ...this.mapOfJoinedFilters(),
+      ...this.params
     });
+  }
+
+  /*
+   * @return {Object} used for requestisation
+   */
+  specificActionObject() {
+    return {
+      params: this.paramsAsObject(),
+    };
+  }
+
+  /** private **/
+
+  /* @api private */
+  get requestActionTypePrefix() {
+    return 'READ';
   }
 
   joinedSideloads() {
@@ -94,9 +112,14 @@ export default class JsonapiResourceReader {
     return splatSortings(this.sortings).join(',');
   }
 
+  /* @api private */
   mapOfJoinedFilters() {
-    return Object.assign(...splatFilters('', this.filters).map(
+    const mapOfFiltersAsPair = splatFilters('', this.filters).map(
       ([key, values]) => ({ [key]: values.map(v => encodeURIComponent(v)).join(',') }),
-    ));
+    )
+    if(isEmpty(mapOfFiltersAsPair)) { return {} }
+    else {
+      return Object.assign(...mapOfFiltersAsPair);
+    }
   }
 }
