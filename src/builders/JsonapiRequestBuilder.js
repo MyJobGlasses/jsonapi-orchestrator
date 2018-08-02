@@ -2,11 +2,7 @@ import { merge } from 'lodash';
 import JsonapiResourceReader from './JsonapiResourceReader';
 import JsonapiResourceWriter from './JsonapiResourceWriter';
 
-const requestActionType = (typePrefix, jsonapiType) => {
-  if (!typePrefix) { throw new Error('You need to set the action type (Create, update, etc.) of your resource !'); }
-  if (!jsonapiType) { throw new Error('You need to set the jsonapiType of your resource !'); }
-  return `${typePrefix.toUpperCase()}_${jsonapiType.toUpperCase()}_RESOURCE`;
-};
+import { requestActionType } from '../utils/builders';
 
 export default class JsonapiRequestBuilder {
   constructor({ resource = null, httpMethod = null, path = '', params = {}, api = null, meta = {} }) {

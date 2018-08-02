@@ -87,7 +87,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     return ({
       sort: this.joinedSortings(),
       include: this.joinedSideloads(),
-      ...this.mapOfJoinedFilters(),
+      ...this._mapOfJoinedFilters(),
       ...this.params
     });
   }
@@ -101,12 +101,12 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     };
   }
 
-  /** private **/
-
-  /* @api private */
   get requestActionTypePrefix() {
     return 'READ';
   }
+
+  /** private **/
+
 
   joinedSideloads() {
     return splatSideloads('', this.sideloads).join(',');
@@ -117,7 +117,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
   /* @api private */
-  mapOfJoinedFilters() {
+  _mapOfJoinedFilters() {
     const mapOfFiltersAsPair = splatFilters('', this.filters).map(
       ([key, values]) => ({ [key]: values.map(v => encodeURIComponent(v)).join(',') }),
     )

@@ -1,5 +1,11 @@
 import { flatten, isObject, isArray, isString, isBoolean } from 'lodash';
 
+export const requestActionType = (typePrefix, jsonapiType) => {
+  if (!typePrefix) { throw new Error('You need to set the action type (Create, update, etc.) of your resource !'); }
+  if (!jsonapiType) { throw new Error('You need to set the jsonapiType of your resource !'); }
+  return `${typePrefix.toUpperCase()}_${jsonapiType.toUpperCase()}_RESOURCE`;
+};
+
 /* Resolve path dulications of sideloadings, and make an array that is very easy to merge for json:api compliance
  *
  * @param { Object } startingSideloadPath - Current path to start from

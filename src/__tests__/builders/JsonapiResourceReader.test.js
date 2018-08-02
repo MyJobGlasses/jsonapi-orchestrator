@@ -51,7 +51,7 @@ describe('JsonapiResourceReader', () => {
         test('merges appropriately nested filters', () => {
           // ?filter[companyname]=airfrance,axa]
           instance.filter({ companyname: ['airfrance', 'axa'] });
-          expect(instance.mapOfJoinedFilters()).toMatchObject({
+          expect(instance._mapOfJoinedFilters()).toMatchObject({
             'filter[companyname]': 'airfrance,axa',
           });
         });
@@ -59,7 +59,7 @@ describe('JsonapiResourceReader', () => {
         test('handles nested filters', () => {
           // ?filter[company][name]=airfrance,axa]
           instance.filter({ company: { name: ['airfrance', 'axa'] } });
-          expect(instance.mapOfJoinedFilters())
+          expect(instance._mapOfJoinedFilters())
             .toEqual(expect.objectContaining({
               'filter[company][name]': 'airfrance,axa'
             }));
@@ -69,7 +69,7 @@ describe('JsonapiResourceReader', () => {
           // ?filter[company][name]=airfrance,axa]
           instance.filter({ company: { name: ['air france', 'axa'] } });
           instance.filter({ company: { sector: ['it, digital', 'business'] } });
-          expect(instance.mapOfJoinedFilters()).toMatchObject({
+          expect(instance._mapOfJoinedFilters()).toMatchObject({
             'filter[company][name]': 'air%20france,axa',
             'filter[company][sector]': 'it%2C%20digital,business'
           });

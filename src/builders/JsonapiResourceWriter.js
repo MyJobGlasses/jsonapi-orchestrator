@@ -1,25 +1,7 @@
-import { merge, mergeWith, isEmpty, isArray, flatMap, forOwn } from 'lodash';
+import { merge, flatMap, forOwn } from 'lodash';
 import Uuid from 'uuid/v4';
 
 import JsonapiResourceBuilder from './JsonapiResourceBuilder';
-
-const concatNestedArrayCustomizer = (a, b) => {
-  if (isArray(a)) {
-    return a.concat(b);
-  };
-};
-
-/* eslint-disable no-param-reassign */
-const addRelationship = (name, valueOrValues, method, iVar) => {
-  if (valueOrValues instanceof Array) {
-    valueOrValues.forEach( (resource) => { resource.method = method; });
-    iVar[name] = (iVar[name] || []).concat(valueOrValues);
-  } else {
-    valueOrValues.method = method;
-    iVar[name] = valueOrValues;
-  }
-};
-/* eslint-enable no-param-reassign */
 
 export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
   constructor(args = {}) {
@@ -64,25 +46,40 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
 
   /* @param sidepost {Object<String, Composite>}
    *   - end values must be
-   *     - either JsonapiResourceWriters (toOne relationships)
-   *     - ... or Array<JsonapiResourceWriters> (toMany)
+   *     - either JsonapiResourceWriters (to-one relationships)
+   *     - ... or Array<JsonapiResourceWriters> (to-many relationships)
    *
-   * @example sidepost('message', new JsonapiResourceWriter(
-   *   jsonapiType: 'message', attributes: { text: 'Hello World!' }
+   * @example
+   *
+   * const toOneMessageSidepost = new JsonapiResourceWriter(
+   *   jsonapiType: 'message', attributes: { text: 'Jsonapi Orchestrator is cool!' }
    * ))
+   *
+   * feedBackWriter.sidepost('message', toOneMessageSidepost)
    *   # => Will record message for sidepost#create
    *
    */
   sidepost(key, valueOrValues) {
-    addRelationship(key, valueOrValues, 'create', this.sideposts);
+    this._addRelationship(key, valueOrValues, 'create', 'sideposts');
   }
 
   associate(key, valueOrValues) {
-    addRelationship(key, valueOrValues, 'associate', this.associations);
+    this._addRelationship(key, valueOrValues, 'associate', 'associations');
   }
 
   disassociate(key, valueOrValues) {
-    addRelationship(key, valueOrValues, 'disassociate', this.disassociations);
+    this._addRelationship(key, valueOrValues, 'disassociate', 'disassociations');
+  }
+
+  _addRelationship(name, valueOrValues, method, iVarName) {
+    const iVar = this[iVarName];
+    if (valueOrValues instanceof Array) {
+      valueOrValues.forEach( (resource) => { resource.method = method; });
+      iVar[name] = (iVar[name] || []).concat(valueOrValues);
+    } else {
+      valueOrValues.method = method;
+      iVar[name] = valueOrValues;
+    }
   }
 
 
@@ -148,17 +145,15 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
    */
 
   relationshipsIterable() {
-    return mergeWith(
-      {}, this.sideposts, this.associations, this.disassociations,
-      concatNestedArrayCustomizer,
-    );
+    return ({
+      ...this.sideposts,
+      ...this.associations,
+      ...this.disassociations,
+    });
   }
 
   includedIterable() {
-    return mergeWith({},
-      this.sideposts,
-      concatNestedArrayCustomizer
-    );
+    return this.sideposts;
   }
 
   jsonapiJsonForDataRelationships() {

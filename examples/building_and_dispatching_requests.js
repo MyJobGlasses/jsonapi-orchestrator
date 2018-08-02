@@ -41,7 +41,7 @@ function * initEmployeePageView() {
     api: APIs.HERMES // Helps set the base URL
   })
 
-  yield put(requestBuilder.action)
+  yield put(requestBuilder.action())
   return yield race({
     success: take(READ_EMPLOYEE_RESOURCE_SUCCESS),
     error: take(READ_EMPLOYEE_RESOURCE_ERROR),
