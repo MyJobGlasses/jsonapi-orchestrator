@@ -38,7 +38,7 @@ function * initEmployeePageView() {
     method: 'GET',
     path: '/employee/profile/:id',
     params: { id: employeeId } // Should be smart substituted
-    api: APIs.HERMES // Helps set the base URL
+    api: APIs.EMPLOYEE_API // Helps set the base URL
   })
 
   yield put(requestBuilder.asReduxAction())
@@ -54,10 +54,7 @@ function * initEmployeePageView() {
  */
 
 function * initConversationsPageView() {
-  conversationsReader = new JsonapiResourceReader({
-    type: 'messaging/conversation',
-    collection: true
-  })
+  conversationsReader = new JsonapiResourceListReader({ type: 'messaging/conversation' })
 
   /* Data expiration
    * On READ Lists, it should generate an index whose ID is a hash of
@@ -83,7 +80,7 @@ function * initConversationsPageView() {
     resource: conversationsReader,
     method: 'GET',
     path: '/conversations',
-    api: APIs.HERMES
+    api: APIs.CONVERSATIONS_API_V1
   })
 
   yield put(requestBuilder.asReduxAction())
@@ -124,7 +121,7 @@ function* createProfessional(action) {
   requestBuilder = new JsonapiRequestBuilder({
     builder: employeeWriter,
     method: 'POST',
-    api: process.env.HERMES_API_URL,
+    api: APIs.EMPLOYEE_API,
     attributes: existingEmployee.attributes
   })
   requestBuilder.endpointPath = '/employee/profile'
