@@ -54,8 +54,9 @@ function * initEmployeePageView() {
  */
 
 function * initConversationsPageView() {
-  conversationsReader = new JsonapiResourceListReader({
+  conversationsReader = new JsonapiResourceReader({
     type: 'messaging/conversation',
+    collection: true
   })
 
   /* Data expiration

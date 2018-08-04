@@ -8,7 +8,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     super(args);
 
     const {
-      fetchCollection = false,
+      collection = false,
       sideloads = {}, sortings = [], filters = {},
       dataMustBeFresherThan = null,
     } = args;
@@ -17,7 +17,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     this.sortings = sortings || []; // Ordered array
     this.filters = filters || {};
     this.dataMustBeFresherThan = dataMustBeFresherThan;
-    this.fetchCollection = fetchCollection;
+    this.collection = collection;
   }
 
   /*
@@ -106,7 +106,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
   requestActionTypePrefix() {
-    return this.fetchCollection ? 'READ' : 'READ_LIST';
+    return this.collection ? 'READ' : 'READ_LIST';
   }
 
 

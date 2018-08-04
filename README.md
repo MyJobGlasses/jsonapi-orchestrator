@@ -43,7 +43,8 @@ requestBuilder = new JsonapiRequestBuilder({
   method: 'GET',
   path: '/employee/profile/:id',
   params: { id: employeeId }
-  api: APIs.HERMES
+  collection: false,
+  api: APIs.HERMES,
 })
 
 yield put(requestBuilder.action())
