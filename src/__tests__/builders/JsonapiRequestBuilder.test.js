@@ -1,5 +1,6 @@
 import JsonapiRequestBuilder from '../../builders/JsonapiRequestBuilder';
 import JsonapiResourceReader from '../../builders/JsonapiResourceReader';
+import JsonapiResourceListReader from '../../builders/JsonapiResourceListReader';
 import JsonapiResourceWriter from '../../builders/JsonapiResourceWriter';
 
 describe('JsonapiRequestBuilder', () => {
@@ -40,21 +41,56 @@ describe('JsonapiRequestBuilder', () => {
       });
     });
 
+    describe('#compileUrl', () => {
+      beforeEach(() => {
+        requestBuilder = new JsonapiRequestBuilder({
+          path: 'conversations/:id',
+          params: { id: 'cafebabe', otherURIParam: 'deadbeef' },
+        });
+      });
+
+      test('replaces params appropriately', () => {
+        expect(requestBuilder.compileUrl())
+          .toBe('conversations/cafebabe?otherURIParam=deadbeef');
+      });
+    });
+
     describe('#action', () => {
-      describe('building a read request', () => {
+      describe('building a single document read request', () => {
         beforeEach(() => {
           resource = new JsonapiResourceReader({
-            jsonapiType: 'conversation', params: { id: 'cafebabe' },
+            jsonapiType: 'conversation',
           });
           requestBuilder = new JsonapiRequestBuilder({
-            resource, method: 'OPTIONS', path: '/conversations',
+            resource,
+            method: 'OPTIONS',
+            path: '/conversations/:id',
+            params: { id: 'cafebabe' },
           });
         });
 
         test('returns a correct read action', () => {
-          expect(requestBuilder.action()).toMatchObject({
+          expect(requestBuilder.asReduxAction()).toMatchObject({
             type: 'READ_CONVERSATION_RESOURCE',
-            // params: { id: 'cafebabe' },
+            url: '/conversations/cafebabe',
+            meta: {},
+          });
+        });
+      });
+
+      describe('building a document collection read request', () => {
+        beforeEach(() => {
+          resource = new JsonapiResourceListReader({
+            jsonapiType: 'conversation',
+          });
+          requestBuilder = new JsonapiRequestBuilder({
+            resource, httpMethod: 'OPTIONS', path: '/conversations',
+          });
+        });
+
+        test('returns a correct read action', () => {
+          expect(requestBuilder.asReduxAction()).toMatchObject({
+            type: 'READ_LIST_CONVERSATION_RESOURCE',
             meta: {},
           });
         });
@@ -76,6 +112,7 @@ describe('JsonapiRequestBuilder', () => {
               clientId: '0ff1ce',
             },
           });
+          resource = conversationResource
           conversationResource.sidepost('messages', [messageResource]);
           requestBuilder = new JsonapiRequestBuilder({
             resource: conversationResource, path: '/conversations',
@@ -83,9 +120,8 @@ describe('JsonapiRequestBuilder', () => {
         });
 
         test('returns a correct write action', () => {
-          expect(requestBuilder.action()).toMatchObject({
+          expect(requestBuilder.asReduxAction()).toMatchObject({
             type: 'CREATE_CONVERSATION_RESOURCE',
-            params: { userid: 'cafebabe' },
             data: {
               type: 'conversation',
               attributes: { recipient: 'deadbeef' },

@@ -2,7 +2,7 @@ import { merge } from 'lodash';
 import JsonapiResourceReader from './JsonapiResourceReader';
 import JsonapiResourceWriter from './JsonapiResourceWriter';
 
-import { requestActionType } from '../utils/builders';
+import { requestActionType, mergeParamsInUrlPlaceholdersAndParams } from '../utils/builders';
 
 export default class JsonapiRequestBuilder {
   constructor({
@@ -16,17 +16,19 @@ export default class JsonapiRequestBuilder {
     this.meta = meta;
   }
 
-  action() {
+  asReduxAction() {
+    if (!this.resource) { throw new Error('This request needs a resource') }
     this.ensureReadyToPerform();
     return ({
       type: requestActionType(
         this.resource.requestActionTypePrefix(),
         this.resource.jsonapiType,
       ),
+      url: this.compileUrl(),
       meta: this.resource.meta,
       resolve: this.promiseResolve,
       reject: this.promiseReject,
-      ...this.resource.specificActionObject(),
+      ...this.resource.asReduxAction(),
     });
   }
 
@@ -51,5 +53,20 @@ export default class JsonapiRequestBuilder {
     if (!this.resource) { throw new Error('You need to supply a resource builder'); }
     if (!this.path) { throw new Error('Supply a path for the resource'); }
     if (!this.httpMethod || !this.inferHttpMethod) { throw new Error('HTTP Method cannot be inferred, please supply it'); }
+  }
+
+  /* Return a compiled URL with placeholders replaced and params merged
+   * @example
+   *
+   *   JsonapiRequestBuilder.new(
+   *     path: '/conversations/:id?template=mini',
+   *     params: {id: 'cafebabe', adminAccess: true},
+   *   ).compileUrl()
+   *   # => '/conversations/cafebabe?template=mini&adminAccess=true'
+   *
+   * @return {String} compiled URL
+   */
+  compileUrl() {
+    return mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
   }
 }

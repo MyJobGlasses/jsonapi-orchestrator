@@ -26,7 +26,7 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
   /*
    * @return {Object} used for requestisation
    */
-  specificActionObject() {
+  asReduxAction() {
     return ({
       params: this.params,
       data: this.asJsonapiDataJson(),
@@ -89,6 +89,16 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
    ****************************************
    */
 
+  /*
+   * @return {Object} - Object ready for serialization under .data or .included
+   * @return {Object.type}
+   * @return {Object.id} - Optional
+   * @return {Object.temp-id} - temporary ID created for matching nested objects
+   * @return {Object.attributes} - list of attributes
+   * @return {Object.relationships} - list of relationships
+   * @return {Object.meta} - Metadata associated with the object and this request
+   *
+   */
   asJsonapiDataJson() {
     return this.addIdOrTempId({
       type: this.jsonapiType,
@@ -98,12 +108,15 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
     });
   }
 
-  /*
+  /* Our Jsonapi relationship serialization is compatible with the sidepost draft
+   *   (https://github.com/json-api/json-api/pull/1197)
+   *
    * @return {Object} - Object ready for serialization as relationship
    * @return {Object.type}
    * @return {Object.id} - Optional
    * @return {Object.temp-id} - temporary ID created for matching nested objects
-   * @return {Object.method}
+   * @return {Object.method} - method used for updating the relationship
+   *                           (associate, disassociate, create, update)
    *
    */
   asJsonapiRelationshipJson() {
@@ -124,7 +137,7 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
   }
 
   /* @api private */
-  get requestActionTypePrefix() {
+  requestActionTypePrefix() {
     return this.inferMethod() === 'create' ? 'CREATE' : 'UPDATE';
   }
 

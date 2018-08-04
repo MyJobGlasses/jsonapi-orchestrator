@@ -47,14 +47,14 @@ requestBuilder = new JsonapiRequestBuilder({
   api: APIs.HERMES,
 })
 
-yield put(requestBuilder.action())
+yield put(requestBuilder.asReduxAction())
 ```
 
 ### Basic POST of single document with sideposting
 
 ```javascript
 employeeWriter = new JsonapiResourceWriter({ type: 'employee/profile' })
-resourceBuilder.setAttributes(...action.attributes)
+resourceBuilder.setAttributes(...asReduxAction.attributes)
 
 // Sidepost the user
 userBuilder = new JsonapiResourceWriter({
@@ -82,7 +82,7 @@ requestBuilder = new JsonapiRequestBuilder({
 requestBuilder.endpointPath = '/employee/profile'
 requestBuilder.addMeta({ invitation_token: invitation_token }) // SHould merge with existing metas
 
-yield put(requestBuilder.action)
+yield put(requestBuilder.asReduxAction())
 ```
 
 You can find more advanced examples, including redux-saga based examples, [in the /examples folder](./examples/)

@@ -1,4 +1,10 @@
-import { flatten, isObject, isArray, isString, isBoolean } from 'lodash';
+import {
+  flatten,
+  isObject, isArray, isString, isBoolean,
+  omit,
+  forOwn,
+  clone
+} from 'lodash';
 
 export const requestActionType = (typePrefix, jsonapiType) => {
   if (!typePrefix) { throw new Error('You need to set the action type (Create, update, etc.) of your resource !'); }
@@ -110,3 +116,69 @@ export const splatSortings = sortings => sortings.map((sorting) => {
   }
   throw new Error(`Sorting only accepts nested objects with ending values being strings 'asc' or 'desc', but received ${currentSortValueOrObject}`);
 });
+
+/* @private
+ *
+ * Replace placeholder params in URLs
+ *
+ * @param url { String } url with placeholders
+ * @param params { Object } params
+ *
+ * @return { Object } Object including new URL and replaced params
+ *
+ * @example
+ *   replaceURlPlaceholders('/conversations/:id', { id 'cafebabe', otherParam: 'deadbeef' })
+ *   # => { url: '/conversations/cafebabe', replacedParams: [:id] }
+ */
+const replaceUrlPlaceholders = (url, params) => {
+  let mappedRoute = clone(url);
+  const replacedParams = [];
+  forOwn(params, (value, key) => {
+    const placeholder = `:${key}`;
+    if (mappedRoute.indexOf(placeholder) !== -1) {
+      mappedRoute = mappedRoute.replace(placeholder, value.toString());
+      replacedParams.push(key)
+    }
+  });
+  return { url: mappedRoute, replacedParams };
+};
+
+/* @private
+ *
+ * Merge params in URL params
+ *
+ * @example
+ *
+ *   mergeParamsInUrlParams('/conversation/:id?param1=1&param2=2', { param2: 2bis, param3: 3 })
+ *     # => '/conversation/:id?param1=1&param2=2bis&param3=3'
+ *
+ */
+const mergeParamsInUrlParams = (url, params) => {
+  const originalSearchParams = url.split('?')[1] || '';
+  // TODO: @Dima polyfill URLSearchParams
+  const paramsManager = new URLSearchParams(originalSearchParams);
+  Object.keys(params).forEach(k => paramsManager.set(k, params[k]));
+  const hasNoParams = paramsManager.keys().next().done
+  if (originalSearchParams) {
+    return url.replace(`?${originalSearchParams}`, `?${paramsManager.toString()}`);
+  } else if (hasNoParams) {
+    return url;
+  } else {
+    return `${url}?${paramsManager.toString()}`;
+  }
+};
+
+/*
+ * @example
+ *
+ *   mergeParamsInUrlParams(
+ *     '/conversation/:id?param1=1',
+ *     { id: 'cafebabe', param2: 2bis, param3: 3 })
+ *   )
+ *   # => '/conversation/cafebabe?param1=1&param2=2bis&param3=3'
+ *
+ */
+export const mergeParamsInUrlPlaceholdersAndParams = (originalUrl, params) => {
+  const { url, replacedParams } = replaceUrlPlaceholders(originalUrl, params);
+  return mergeParamsInUrlParams(url, omit(params, replacedParams));
+};

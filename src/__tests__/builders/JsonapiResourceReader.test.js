@@ -12,14 +12,12 @@ describe('JsonapiResourceReader', () => {
         sortings: { messages: { created_at: 'asc' } },
         filters: { messages: { acknowledged: [true] } },
         dataMustBeFresherThan: freshness,
-        collection: true,
       });
 
       expect(instance.jsonapiType).toBe('conversation');
       expect(instance.meta).toEqual(expect.objectContaining({ type: 'redCarpet' }));
       expect(instance.sideloads).toEqual(expect.objectContaining({ messages: true }));
       expect(instance.sortings).toEqual(expect.objectContaining({ messages: { created_at: 'asc' } }));
-      expect(instance.collection).toBe(true);
       expect(instance.filters)
         .toEqual(expect.objectContaining({ messages: { acknowledged: [true] } }));
     });
