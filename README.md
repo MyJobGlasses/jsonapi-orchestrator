@@ -30,6 +30,28 @@ Our Jsonapi builders will let you store this metadata so it can be reused with c
 
 Here are some examples of basic read and writes
 
+### APIs
+
+You can manage a list of multiple APIs easily
+
+```javascript
+// my-apis.js
+const EMPLOYEE_API_V1 = new API({
+  name: 'Employee API v1', url: 'https://employee.example.com/api/v1'
+})
+const EMPLOYEE_API_V2 = new API({
+  name: 'Employee API v2', url: process.env.EMPLOYEE_API_V1_URL
+})
+const METRICS_API_V2 = new API({
+  name: 'Metrics API v2', url: 'https://metrics.example.com/api/v2'
+})
+
+export default { METRICS_API_V2, EMPLOYEE_API_V1, EMPLOYEE_API_V2 }
+
+// somewhere
+import APIs from 'my-apis'
+```
+
 ### Basic READ of single document
 
 ```javascript
@@ -44,7 +66,7 @@ requestBuilder = new JsonapiRequestBuilder({
   path: '/employee/profile/:id',
   params: { id: employeeId }
   collection: false,
-  api: APIs.HERMES,
+  api: APIs.EMPLOYEE_API_V1,
 })
 
 yield put(requestBuilder.asReduxAction())
@@ -76,7 +98,7 @@ educationBuilders = action.educations.forEach( (e) => {
 requestBuilder = new JsonapiRequestBuilder({
   builder: employeeWriter,
   method: 'POST',
-  api: process.env.HERMES_API_URL,
+  api: APIs.EMPLOYEE_API_V1,
   attributes: existingEmployee.attributes
 })
 requestBuilder.endpointPath = '/employee/profile'

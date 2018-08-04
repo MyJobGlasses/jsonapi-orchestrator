@@ -67,6 +67,9 @@ export default class JsonapiRequestBuilder {
    * @return {String} compiled URL
    */
   compileUrl() {
+    if (this.api) {
+      return this.api.url + mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
+    }
     return mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
   }
 }

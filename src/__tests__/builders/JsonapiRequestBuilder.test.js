@@ -2,6 +2,7 @@ import JsonapiRequestBuilder from '../../builders/JsonapiRequestBuilder';
 import JsonapiResourceReader from '../../builders/JsonapiResourceReader';
 import JsonapiResourceListReader from '../../builders/JsonapiResourceListReader';
 import JsonapiResourceWriter from '../../builders/JsonapiResourceWriter';
+import Api from '../../api';
 
 describe('JsonapiRequestBuilder', () => {
   let requestBuilder;
@@ -66,13 +67,14 @@ describe('JsonapiRequestBuilder', () => {
             method: 'OPTIONS',
             path: '/conversations/:id',
             params: { id: 'cafebabe' },
+            api: new Api({ url: 'https://conversation.example.com' }),
           });
         });
 
         test('returns a correct read action', () => {
           expect(requestBuilder.asReduxAction()).toMatchObject({
             type: 'READ_CONVERSATION_RESOURCE',
-            url: '/conversations/cafebabe',
+            url: 'https://conversation.example.com/conversations/cafebabe',
             meta: {},
           });
         });
