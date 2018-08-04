@@ -5,7 +5,9 @@ import JsonapiResourceWriter from './JsonapiResourceWriter';
 import { requestActionType } from '../utils/builders';
 
 export default class JsonapiRequestBuilder {
-  constructor({ resource = null, httpMethod = null, path = '', params = {}, api = null, meta = {} }) {
+  constructor({
+    resource = null, httpMethod = null, path = '', params = {}, api = null, meta = {},
+  }) {
     this.resource = resource;
     this.httpMethod = httpMethod || this.inferHttpMethod();
     this.path = path;
@@ -18,7 +20,7 @@ export default class JsonapiRequestBuilder {
     this.ensureReadyToPerform();
     return ({
       type: requestActionType(
-        this.resource.requestActionTypePrefix,
+        this.resource.requestActionTypePrefix(),
         this.resource.jsonapiType,
       ),
       meta: this.resource.meta,

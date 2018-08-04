@@ -35,7 +35,7 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
   }
 
   addAttributes(newAttributes) {
-    merge(this.attributes, newAttributes)
+    merge(this.attributes, newAttributes);
   }
 
   /**
@@ -74,10 +74,10 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
   _addRelationship(name, valueOrValues, method, iVarName) {
     const iVar = this[iVarName];
     if (valueOrValues instanceof Array) {
-      valueOrValues.forEach( (resource) => { resource.method = method; });
+      valueOrValues.forEach((resource) => { resource.setMethod(method); });
       iVar[name] = (iVar[name] || []).concat(valueOrValues);
     } else {
-      valueOrValues.method = method;
+      valueOrValues.setMethod(method);
       iVar[name] = valueOrValues;
     }
   }
@@ -128,11 +128,14 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
     return this.inferMethod() === 'create' ? 'CREATE' : 'UPDATE';
   }
 
+  setMethod(method) {
+    this.method = method;
+  }
+
   inferMethod() {
     if (this.method) {
       return this.method;
-    }
-    else if (!this.id) {
+    } else if (!this.id) {
       return 'create';
     }
     return 'update';
@@ -158,11 +161,13 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
 
   jsonapiJsonForDataRelationships() {
     const relationshipsJson = {};
-    const iterable = this.relationshipsIterable()
+    const iterable = this.relationshipsIterable();
     Object.keys(iterable).forEach((key) => {
       const val = iterable[key];
       if (val instanceof Array) {
-        relationshipsJson[key] = { data: val.map( singleRelationship => singleRelationship.asJsonapiRelationshipJson()) };
+        relationshipsJson[key] = {
+          data: val.map(singleRelationship => singleRelationship.asJsonapiRelationshipJson()),
+        };
       } else {
         relationshipsJson[key] = { data: val.asJsonapiRelationshipJson() };
       }
@@ -172,12 +177,15 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
 
   jsonapiJsonForIncluded() {
     const included = [];
-    const iterable = this.includedIterable()
+    const iterable = this.includedIterable();
     Object.keys(iterable).forEach((key) => {
       const val = iterable[key];
       if (val instanceof Array) {
-        merge(included, val.map( includedResource => includedResource.asJsonapiDataJson()));
-        merge(included, flatMap(val, includedResource => includedResource.jsonapiJsonForIncluded()));
+        merge(included, val.map(includedResource => includedResource.asJsonapiDataJson()));
+        merge(
+          included,
+          flatMap(val, includedResource => includedResource.jsonapiJsonForIncluded()),
+        );
       } else {
         included.push(val.asJsonapiDataJson());
         merge(included, val.jsonapiJsonForIncluded());

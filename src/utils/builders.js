@@ -6,7 +6,8 @@ export const requestActionType = (typePrefix, jsonapiType) => {
   return `${typePrefix.toUpperCase()}_${jsonapiType.toUpperCase()}_RESOURCE`;
 };
 
-/* Resolve path dulications of sideloadings, and make an array that is very easy to merge for json:api compliance
+/* Resolve path dulications of sideloadings,
+ * and make an array that is very easy to merge for json:api compliance
  *
  * @param { Object } startingSideloadPath - Current path to start from
  * @param { Object } nestedSideloads - nested sideloads to merge
@@ -18,7 +19,7 @@ export const requestActionType = (typePrefix, jsonapiType) => {
  */
 export const splatSideloads = (startingSideloadPath = '', nestedSideloads = {}) => {
   const currentSideloads = [];
-  Object.keys(nestedSideloads).forEach( (nestedKey) => {
+  Object.keys(nestedSideloads).forEach((nestedKey) => {
     const currentSideloadValue = nestedSideloads[nestedKey];
     let currentSideloadPath;
     if (startingSideloadPath === '') {
@@ -31,20 +32,23 @@ export const splatSideloads = (startingSideloadPath = '', nestedSideloads = {}) 
     } else if (isObject(currentSideloadValue)) {
       currentSideloads.push(splatSideloads(currentSideloadPath, currentSideloadValue));
     } else {
-      throw new Error(`Sideloading only accepts true or nested objects as sideloads, but received ${currentSideloadValue}`)
+      throw new Error(`Sideloading only accepts true or nested objects as sideloads, but received ${currentSideloadValue}`);
     }
   });
   return flatten(currentSideloads);
 };
 
-/* Resolve path dulications of filters, and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
+/* Resolve path dulications of filters,
+* and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
  *
  * @param { Object } startingFilterPath - Current path to start from
  * @param { Object } nestedFilters - nested filters to merge
  * @return { Array } of filter => Array value pair
  *
  * @example
- *   splatFilters('mainProfile.user', { avatar: [true], firstName: ['Martine', 'Albert'], notifications: { newsletter: true } })
+ *   splatFilters('mainProfile.user',
+ *     { avatar: [true], firstName: ['Martine', 'Albert'], notifications: { newsletter: true } }
+ *   )
  *   # => [
  *     ['mainProfile[user][avatar]', [true]],
  *     ['mainProfile[user][firstName]', ['Martine', 'Albert']
@@ -53,7 +57,7 @@ export const splatSideloads = (startingSideloadPath = '', nestedSideloads = {}) 
  */
 export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
   let currentFilters = [];
-  Object.keys(nestedFilters).forEach( (nestedKey) => {
+  Object.keys(nestedFilters).forEach((nestedKey) => {
     const currentFilterValue = nestedFilters[nestedKey];
     let currentFilterPath;
     if (startingFilterPath === '') {
@@ -62,20 +66,26 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
       currentFilterPath = `${startingFilterPath}[${nestedKey}]`;
     }
     if (isObject(currentFilterValue) && !isArray(currentFilterValue)) {
-      currentFilters = currentFilters.concat(splatFilters(currentFilterPath, currentFilterValue, true));
-    } else if (isString(currentFilterValue) || isArray(currentFilterValue) || isBoolean(currentFilterValue)) {
+      currentFilters = currentFilters
+        .concat(splatFilters(currentFilterPath, currentFilterValue, true));
+    } else if (
+      isString(currentFilterValue) ||
+      isArray(currentFilterValue) ||
+      isBoolean(currentFilterValue)
+    ) {
       currentFilters.push([
         currentFilterPath,
-        isArray(currentFilterValue) ? currentFilterValue : [currentFilterValue]
+        isArray(currentFilterValue) ? currentFilterValue : [currentFilterValue],
       ]);
     } else {
-      throw new Error(`Filtering only accepts nested objects or strings or arrays as Filters, but received ${currentFilterValue}`)
+      throw new Error(`Filtering only accepts nested objects or strings or arrays as Filters, but received ${currentFilterValue}`);
     }
   });
   return currentFilters;
 };
 
-/* Assemble sorting paths, and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
+/* Assemble sorting paths,
+ * and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
  *
  * @param { Array<Object> } sortings - List of sorting hashes
  * @return { Array } of sortings with +/- prefix
@@ -84,21 +94,19 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
  *   splatSortings([ { avatar: [true] }, { notifications: { newsletter: true } }])
  *   # => ['-avatar', 'notifications[newsletter]']
  */
-export const splatSortings = (sortings) => {
-  return sortings.map( (sorting) => {
-    let [currentSortKey] = Object.keys(sorting);
-    let currentSortPath = currentSortKey;
-    let currentSortValueOrObject = sorting[currentSortKey];
-    while (isObject(currentSortValueOrObject)) {
-      [currentSortKey] = Object.keys(currentSortValueOrObject);
-      currentSortPath = `${currentSortPath}.${currentSortKey}`;
-      currentSortValueOrObject = currentSortValueOrObject[currentSortKey];
-    }
-    if (currentSortValueOrObject === 'asc') {
-      return currentSortPath;
-    } else if (currentSortValueOrObject === 'desc') {
-      return `-${currentSortPath}`;
-    }
-    throw new Error(`Sorting only accepts nested objects with ending values being strings 'asc' or 'desc', but received ${currentSortValueOrObject}`)
-  });
-};
+export const splatSortings = sortings => sortings.map((sorting) => {
+  let [currentSortKey] = Object.keys(sorting);
+  let currentSortPath = currentSortKey;
+  let currentSortValueOrObject = sorting[currentSortKey];
+  while (isObject(currentSortValueOrObject)) {
+    [currentSortKey] = Object.keys(currentSortValueOrObject);
+    currentSortPath = `${currentSortPath}.${currentSortKey}`;
+    currentSortValueOrObject = currentSortValueOrObject[currentSortKey];
+  }
+  if (currentSortValueOrObject === 'asc') {
+    return currentSortPath;
+  } else if (currentSortValueOrObject === 'desc') {
+    return `-${currentSortPath}`;
+  }
+  throw new Error(`Sorting only accepts nested objects with ending values being strings 'asc' or 'desc', but received ${currentSortValueOrObject}`);
+});

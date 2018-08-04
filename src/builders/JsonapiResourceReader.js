@@ -8,6 +8,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     super(args);
 
     const {
+      fetchCollection = false,
       sideloads = {}, sortings = [], filters = {},
       dataMustBeFresherThan = null,
     } = args;
@@ -16,6 +17,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     this.sortings = sortings || []; // Ordered array
     this.filters = filters || {};
     this.dataMustBeFresherThan = dataMustBeFresherThan;
+    this.fetchCollection = fetchCollection;
   }
 
   /*
@@ -53,7 +55,9 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   /* @param filters {Object} filters - List of filters to be applied
    *   - values can be either String, Boolean or Arrays
    *
-   * @example filter({ company_name: ['axa', 'air france'], sector: 'it, digital', published: true]})
+   * @example
+   *
+   *   filter({ company_name: ['axa', 'air france'], sector: 'it, digital', published: true]})
    *   # => Will remember filtering on
    *     - company_names either 'axa' or 'air france'
    *     - sectors 'it, digital' (the ',' will be URLEncoded)
@@ -87,8 +91,8 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     return ({
       sort: this.joinedSortings(),
       include: this.joinedSideloads(),
-      ...this._mapOfJoinedFilters(),
-      ...this.params
+      ...this.mapOfJoinedFilters(),
+      ...this.params,
     });
   }
 
@@ -101,11 +105,9 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     };
   }
 
-  get requestActionTypePrefix() {
-    return 'READ';
+  requestActionTypePrefix() {
+    return this.fetchCollection ? 'READ' : 'READ_LIST';
   }
-
-  /** private **/
 
 
   joinedSideloads() {
@@ -117,13 +119,10 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
   /* @api private */
-  _mapOfJoinedFilters() {
-    const mapOfFiltersAsPair = splatFilters('', this.filters).map(
-      ([key, values]) => ({ [key]: values.map(v => encodeURIComponent(v)).join(',') }),
-    )
-    if(isEmpty(mapOfFiltersAsPair)) { return {} }
-    else {
-      return Object.assign(...mapOfFiltersAsPair);
-    }
+  mapOfJoinedFilters() {
+    const mapOfFiltersAsPair = splatFilters('', this.filters).map(([key, values]) => ({ [key]: values.map(v => encodeURIComponent(v)).join(',') }));
+    if (isEmpty(mapOfFiltersAsPair)) { return {}; }
+
+    return Object.assign(...mapOfFiltersAsPair);
   }
 }

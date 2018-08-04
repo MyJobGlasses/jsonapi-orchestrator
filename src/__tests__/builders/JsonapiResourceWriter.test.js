@@ -37,7 +37,7 @@ describe(JsonapiResourceWriter, () => {
   describe('instances', () => {
     let instance;
     beforeEach(() => {
-      instance = new JsonapiResourceWriter({ attributes: { inConstructor: true }, jsonapiType: 'conversation'});
+      instance = new JsonapiResourceWriter({ attributes: { inConstructor: true }, jsonapiType: 'conversation' });
     });
 
     describe('addAttributes', () => {
@@ -66,7 +66,7 @@ describe(JsonapiResourceWriter, () => {
         const thirdMessageSidepost = new JsonapiResourceWriter({
           jsonapiType: 'message',
           attributes: { text: 'Fantastic World!' },
-        });;
+        });
 
         test('merges appropriately has-one sideposts', () => {
           instance.sidepost('messages', messageSidepost);
@@ -85,7 +85,6 @@ describe(JsonapiResourceWriter, () => {
         });
 
         test('merges multiple sideposts on same relationship', () => {
-
           instance.sidepost('messages', [messageSidepost]);
           instance.sidepost('messages', [secondMessageSidepost, thirdMessageSidepost]);
 

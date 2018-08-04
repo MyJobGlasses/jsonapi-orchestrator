@@ -10,15 +10,16 @@ describe('JsonapiResourceReader', () => {
         method: 'OPTIONS',
         sideloads: { messages: true },
         sortings: { messages: { created_at: 'asc' } },
-        filters: { messages: { acknowledged: [true] }},
+        filters: { messages: { acknowledged: [true] } },
         dataMustBeFresherThan: freshness,
       });
 
-      expect(instance.jsonapiType).toBe('conversation')
-      expect(instance.meta).toEqual(expect.objectContaining({ type: 'redCarpet' }))
-      expect(instance.sideloads).toEqual(expect.objectContaining({ messages: true }))
-      expect(instance.sortings).toEqual(expect.objectContaining({ messages: { created_at: 'asc' }}))
-      expect(instance.filters).toEqual(expect.objectContaining({ messages: { acknowledged: [true] }}))
+      expect(instance.jsonapiType).toBe('conversation');
+      expect(instance.meta).toEqual(expect.objectContaining({ type: 'redCarpet' }));
+      expect(instance.sideloads).toEqual(expect.objectContaining({ messages: true }));
+      expect(instance.sortings).toEqual(expect.objectContaining({ messages: { created_at: 'asc' } }));
+      expect(instance.filters)
+        .toEqual(expect.objectContaining({ messages: { acknowledged: [true] } }));
     });
   });
 
@@ -39,7 +40,7 @@ describe('JsonapiResourceReader', () => {
 
         test('concatenates sortings in the order they were defined', () => {
           // ?sort=-positivelikecount,companyname
-          instance.sort({ positivelikecount: 'desc' }, { companyname: 'asc'} );
+          instance.sort({ positivelikecount: 'desc' }, { companyname: 'asc' });
           expect(instance.joinedSortings())
             .toBe('-positivelikecount,companyname');
         });
@@ -51,7 +52,7 @@ describe('JsonapiResourceReader', () => {
         test('merges appropriately nested filters', () => {
           // ?filter[companyname]=airfrance,axa]
           instance.filter({ companyname: ['airfrance', 'axa'] });
-          expect(instance._mapOfJoinedFilters()).toMatchObject({
+          expect(instance.mapOfJoinedFilters()).toMatchObject({
             'filter[companyname]': 'airfrance,axa',
           });
         });
@@ -59,9 +60,9 @@ describe('JsonapiResourceReader', () => {
         test('handles nested filters', () => {
           // ?filter[company][name]=airfrance,axa]
           instance.filter({ company: { name: ['airfrance', 'axa'] } });
-          expect(instance._mapOfJoinedFilters())
+          expect(instance.mapOfJoinedFilters())
             .toEqual(expect.objectContaining({
-              'filter[company][name]': 'airfrance,axa'
+              'filter[company][name]': 'airfrance,axa',
             }));
         });
 
@@ -69,9 +70,9 @@ describe('JsonapiResourceReader', () => {
           // ?filter[company][name]=airfrance,axa]
           instance.filter({ company: { name: ['air france', 'axa'] } });
           instance.filter({ company: { sector: ['it, digital', 'business'] } });
-          expect(instance._mapOfJoinedFilters()).toMatchObject({
+          expect(instance.mapOfJoinedFilters()).toMatchObject({
             'filter[company][name]': 'air%20france,axa',
-            'filter[company][sector]': 'it%2C%20digital,business'
+            'filter[company][sector]': 'it%2C%20digital,business',
           });
         });
       });
@@ -79,7 +80,6 @@ describe('JsonapiResourceReader', () => {
 
     describe('sideloading', () => {
       describe('flattens sideloads for request', () => {
-
         test('merges appropriately single nested routes into a single string', () => {
           instance.sideload({ profiles: { user: true } });
           expect(instance.joinedSideloads())

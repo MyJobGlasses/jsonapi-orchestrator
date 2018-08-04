@@ -25,7 +25,7 @@ describe('JsonapiRequestBuilder', () => {
 
   describe('instance methods', () => {
     describe('#addMeta', () => {
-      beforeEach( () => {
+      beforeEach(() => {
         requestBuilder = new JsonapiRequestBuilder({});
       });
 

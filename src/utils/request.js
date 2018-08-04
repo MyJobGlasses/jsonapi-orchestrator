@@ -20,7 +20,7 @@ const checkStatus = (response) => {
  */
 export const parseJSON = response => response
   .json()
-  .catch(e => console.log('parse error', e));
+  .catch(e => console.log('parse error', e)); // eslint-disable-line no-console
 
 /**
  *
