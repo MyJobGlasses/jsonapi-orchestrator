@@ -149,9 +149,9 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
     if (this.method) {
       return this.method;
     } else if (!this.id) {
-      return 'create';
+      return 'CREATE';
     }
-    return 'update';
+    return 'UPDATE';
   }
 
   /**

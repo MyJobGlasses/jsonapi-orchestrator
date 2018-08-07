@@ -6,23 +6,36 @@ Building better jsonapi-compliant code
 
 [![CircleCI](https://circleci.com/gh/MyJobGlasses/jsonapi-orchestrator.svg?style=svg)](https://circleci.com/gh/MyJobGlasses/jsonapi-orchestrator)
 
-# What is it ?
+# Why an orchestrator
+
+Jsonapi Orchestrator aims to help you to deal with various stages of json:api based API interaction with (for now) redux-based libs and frameworks
 
 Ever wanted to use...
 - json:api communication with your APIs
 - Redux based storage of resources retrieved from the API
 - Side effects with redux-saga posting to your APIs
 - Caching expensive requests to alleviate load on your APIs
+- Create/update things in one request (Sidepost)
+- Be more explicit about what you're doing (association/disassociation VS creation/deletion)
 
 **Jsonapi Orchestrator is For You 🎁 🎉**
 
-# HOW TO
+# Features & Compatibility oj Jsonapi Orchestrator
 
-Jsonapi Orchestrator helps you to deal with various stages of json:api based API interaction
+Our version Jsonapi Orchestrator is currently made to work with json:api 1.0
+
+Apart from the basic Json:api specification, we aim to support interesting extensions (some of which are projected for json:api v1.1)
+
+- ✅ [The Sideposting Draft](https://github.com/json-api/json-api/pull/1197)
+- 🏗 Supporting `method` in PATCH to distinguish creation VS association
+- 🏗 Support for temporary IDs or `lid`s (see https://github.com/json-api/json-api/pull/1244)
+- 🏗 Support for easy caching of resources
+
+# HOW TO
 
 ## Building json:api Requests
 
-A json:api request can be categorized either as a READ request (GET request) or a WRITE request (POST/PATCH/PUT).
+A json:api request can be categorized either as a READ request (GET request) or a WRITE request (POST/PATCH/PUT). At this point we're not sure how we want to perform DELETEs
 
 Building those requests can be difficult because of the format of filters, sorting, and includes, in addition to specifying the endpoint. In addition, if you ever want to handle caching of requests, you would need to be ablte to specify metadata such as data freshness to decide later if you actually want to fire the query or reuse existing data already fetched.
 
@@ -62,10 +75,8 @@ employeeReader.sort({ next_holiday_at: 'asc' })
 
 requestBuilder = new JsonapiRequestBuilder({
   resource: employeeReader,
-  method: 'GET',
   path: '/employee/profile/:id',
   params: { id: employeeId }
-  collection: false,
   api: APIs.EMPLOYEE_API_V1,
 })
 
@@ -74,8 +85,13 @@ yield put(requestBuilder.asReduxAction())
 
 ### Basic POST of single document with sideposting
 
+Let's POST / Create an employee profile linked to an existing user account
+
 ```javascript
+
 employeeWriter = new JsonapiResourceWriter({ type: 'employee/profile' })
+# Note, since we did not provide any ID the HttpMethod is inferred to be POST
+# Had we provided ({ type: 'employee/profile', id: 'cafebabe' }) it would be inferred to be a PATCH
 resourceBuilder.setAttributes(...asReduxAction.attributes)
 
 // Sidepost the user
@@ -85,7 +101,9 @@ userBuilder = new JsonapiResourceWriter({
   attributes: currentUser.attributes
 })
 employeeWriter.sidepost({
-  relationship: 'user', method: 'update', userBuilder
+  relationship: 'user',
+  method: 'update', # other methods include create/associate/disassociate, refer to the sideposting draft
+  userBuilder
 )
 
 // Sidepost educations

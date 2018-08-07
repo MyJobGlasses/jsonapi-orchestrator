@@ -5,17 +5,72 @@ import JsonapiResourceWriter from './JsonapiResourceWriter';
 import { requestActionType, mergeParamsInUrlPlaceholdersAndParams } from '../utils/builders';
 
 export default class JsonapiRequestBuilder {
+  /**
+   * @param  {Object} params
+   * @param  {JsonapiResourceBuilder} params.resource
+   * @param  {String} params.httpMethod
+   * @param  {String} params.path Path of the request
+   * @param  {Object} params.params Extra HTTP params to add ot the generated URL
+   * @param  {Api} params.api the API to connect to
+   * @param  {Object} params.meta Additional meta to add to the json:api payload
+   */
   constructor({
     resource = null, httpMethod = null, path = '', params = {}, api = null, meta = {},
   }) {
     this.resource = resource;
-    this.httpMethod = httpMethod || this.inferHttpMethod();
+    this._httpMethod = httpMethod;
     this.path = path;
     this.params = params;
     this.api = api;
     this.meta = meta;
   }
 
+  /**
+   * Returns a dispatchable action for this request
+   * Based on the actual resource type, extra fields can be added
+   * Like `return.params` or return.
+   * Please refer to the corresponding resource#asReduxAction method.
+   *
+   * @example
+   *
+   *    resource = new JsonApiResourceWriter({
+   *      type: 'user/project',
+   *      attributes: { name: 'jsonapi orchestrator' },
+   *    })
+   *    request = new JsonApiRequestBuilder({
+   *      resource: resource,
+   *      path: '/users/:id/projects',
+   *      params: { id: '00cafebabe'})
+   *    })
+   *    request.asReduxAction()
+   *
+   *    # => {
+   *      type: CREATE_USER_PROJECT_RESOURCE,
+   *      url: '/users/00cafebabe/projects',
+   *      meta: {},
+   *      resolve: null,
+   *      reject: null,
+   *      # Start of resource.asReduxAction() keys
+   *      params: {},
+   *      data: {
+   *        type: 'user/project'
+   *        attributes: {
+   *          name: 'Jsonapi orchestrator'
+   *        },
+   *        relationships: {},
+   *        meta: {}
+   *      },
+   *      incuded: {}
+   *    }
+   *
+   * @return {Object}
+   * @return {Object} return[Object.keys(...resource.asReduxAction)]
+   * @return {String} return.type
+   * @return {String} return.url relative path of request or (if API provided) full URL
+   * @return {Object} return.meta optional meta
+   * @return {function} Promise resolve callback
+   * @return {function} Promise reject callback
+   */
   asReduxAction() {
     if (!this.resource) { throw new Error('This request needs a resource') }
     this.ensureReadyToPerform();
@@ -32,6 +87,13 @@ export default class JsonapiRequestBuilder {
     });
   }
 
+  /**
+   * Attaches a Promise to this request, that can be reused later
+   * (for example when dispatching the action)
+   *
+   * @param {Function} resolve
+   * @param {Function} reject
+   */
   addPromiseHandlers(resolve, reject) {
     this.promiseResolve = resolve;
     this.promiseReject = reject;
@@ -40,6 +102,25 @@ export default class JsonapiRequestBuilder {
   /* merges additional request meta */
   addMeta(meta) { this.meta = merge(this.meta, meta); }
 
+  /**
+   * @return {String} supplied or inferred httpMethod
+   */
+  get httpMethod() {
+    return this._httpMethod || this.inferHttpMethod();
+  }
+
+  /**
+   * @param {String} httpMethod, capital case
+   */
+  set httpMethod(httpMethod) {
+    this._httpMethod = httpMethod;
+  }
+
+  /**
+   * Infer the HTTP Method for this request, based on the supplied resource
+   *
+   * @return {String}
+   */
   inferHttpMethod() {
     if (this.resource instanceof JsonapiResourceWriter) {
       return this.resource.method === 'update' ? 'PATCH' : 'POST';
@@ -52,7 +133,7 @@ export default class JsonapiRequestBuilder {
   ensureReadyToPerform() {
     if (!this.resource) { throw new Error('You need to supply a resource builder'); }
     if (!this.path) { throw new Error('Supply a path for the resource'); }
-    if (!this.httpMethod || !this.inferHttpMethod) { throw new Error('HTTP Method cannot be inferred, please supply it'); }
+    if (!this.httpMethod) { throw new Error('HTTP Method cannot be inferred, please supply it'); }
   }
 
   /* Return a compiled URL with placeholders replaced and params merged

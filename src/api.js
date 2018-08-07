@@ -4,8 +4,28 @@ export default class Api {
     this._url = url;
   }
 
-  get url() { return this._url; }
+  /*
+   * Get or Set the base URL for APIs.
+   * The URL will be prefixed in various places
+   * If the URL is left empty, only relative paths will be generated
+   *
+   * @param {String}
+   */
   set url(url) { this._url = url; }
-  get name() { return this._url; }
+  /**
+   * @return {String}
+   */
+  get url() { return this._url; }
+
+  /**
+   * Set a friendly name for this API. Will be more convenient when debugging
+   *
+   * @param {String}
+   */
   set name(name) { this._name = name; }
+
+  /**
+   * @return {String}
+   */
+  get name() { return this._url; }
 };
