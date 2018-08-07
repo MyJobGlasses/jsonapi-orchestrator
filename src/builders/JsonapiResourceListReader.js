@@ -5,6 +5,9 @@ export default class JsonapiResourceListReader extends JsonapiResourceReader {
     super(args);
   }
 
+  /**
+   * @override
+   */
   requestActionTypePrefix() {
     return 'READ_LIST';
   }

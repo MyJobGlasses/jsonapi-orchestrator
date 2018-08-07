@@ -99,8 +99,13 @@ export default class JsonapiRequestBuilder {
     this.promiseReject = reject;
   }
 
-  /* merges additional request meta */
-  addMeta(meta) { this.meta = merge(this.meta, meta); }
+  /**
+   * Merge additional request metas
+   * @param {Object}
+   */
+  addMeta(meta) {
+    this.meta = merge(this.meta, meta);
+  }
 
   /**
    * @return {String} supplied or inferred httpMethod
@@ -130,6 +135,10 @@ export default class JsonapiRequestBuilder {
     return undefined;
   }
 
+  /**
+   * Explain what is missing to properly fire the request
+   * @throws {Error} throws various errors
+   */
   ensureReadyToPerform() {
     if (!this.resource) { throw new Error('You need to supply a resource builder'); }
     if (!this.path) { throw new Error('Supply a path for the resource'); }
