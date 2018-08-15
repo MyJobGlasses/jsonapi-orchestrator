@@ -1,6 +1,9 @@
 import {
   flatten,
-  isObject, isArray, isString, isBoolean,
+  isObject,
+  isArray,
+  isString,
+  isBoolean,
   omit,
   forOwn,
   clone,

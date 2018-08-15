@@ -12,6 +12,7 @@ export default class Api {
    * @param {String}
    */
   set url(url) { this._url = url; }
+
   /**
    * @return {String}
    */
@@ -27,5 +28,5 @@ export default class Api {
   /**
    * @return {String}
    */
-  get name() { return this._url; }
+  get name() { return this._name; }
 }

@@ -47,7 +47,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
 
   /**
    * Indicates the resource can reuse existing cache if newer that +date+
-   * @param  {Date}
+   * @param {Date}
    */
   dataMustBeFresherThan(date) {
     this.mustBeFresherThan = date;
@@ -173,7 +173,10 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
    * @return {Object[]}
    */
   mapOfJoinedFilters() {
-    const mapOfFiltersAsPair = splatFilters('', this.filters).map(([key, values]) => ({ [key]: values.map(v => encodeURIComponent(v)).join(',') }));
+    const mapOfFiltersAsPair = splatFilters('', this.filters)
+      .map(([key, values]) => ({
+        [key]: values.map(v => encodeURIComponent(v)).join(','),
+      }));
     if (isEmpty(mapOfFiltersAsPair)) { return {}; }
 
     return Object.assign(...mapOfFiltersAsPair);

@@ -15,7 +15,12 @@ export default class JsonapiRequestBuilder {
    * @param  {Object} params.meta Additional meta to add to the json:api payload
    */
   constructor({
-    resource = null, httpMethod = null, path = '', params = {}, api = null, meta = {},
+    resource = null,
+    httpMethod = null,
+    path = '',
+    params = {},
+    api = null,
+    meta = {},
   }) {
     this.resource = resource;
     this._httpMethod = httpMethod;
@@ -103,7 +108,7 @@ export default class JsonapiRequestBuilder {
 
   /**
    * Merge additional request metas
-   * @param {Object}
+   * @param {Object} meta
    */
   addMeta(meta) {
     this.meta = merge(this.meta, meta);
