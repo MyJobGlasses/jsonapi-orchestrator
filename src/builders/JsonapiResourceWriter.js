@@ -49,6 +49,10 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
     });
   }
 
+  /**
+   * Add attributes to be persisted
+   * @param {Object} newAttributes
+   */
   addAttributes(newAttributes) {
     merge(this.attributes, newAttributes);
   }
