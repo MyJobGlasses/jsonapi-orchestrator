@@ -8,6 +8,7 @@ export default class JsonapiResourceListReader extends JsonapiResourceReader {
   /**
    * @override
    */
+  // eslint-disable-next-line class-methods-use-this
   requestActionTypePrefix() {
     return 'READ_LIST';
   }

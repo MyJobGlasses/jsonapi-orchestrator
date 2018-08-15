@@ -28,4 +28,4 @@ export default class Api {
    * @return {String}
    */
   get name() { return this._url; }
-};
+}

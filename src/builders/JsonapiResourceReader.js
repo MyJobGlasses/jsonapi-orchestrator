@@ -4,7 +4,6 @@ import JsonapiResourceBuilder from './JsonapiResourceBuilder';
 import { splatSideloads, splatSortings, splatFilters } from '../utils/builders';
 
 export default class JsonapiResourceReader extends JsonapiResourceBuilder {
-
   /**
    * @param {Object} args See inherited params from @JsonapiResourceBuilder
    * @param {Object} args.sideloads See {@link #sideload()}
@@ -54,9 +53,11 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     this.mustBeFresherThan = date;
   }
 
-  /***************************
+  /**
+   ***************************
    *** Sorting & Filtering ***
-   ***************************/
+   ***************************
+   */
 
   /**
    * @param {Iterable<Object>} sortings - as many objects as you want, in sort order,
@@ -137,9 +138,10 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
   /**
-   * No extra action keys are needed to represent READ requests
+   * @override - No extra action keys are needed to represent READ requests
    * @return {Object}
    */
+  // eslint-disable-next-line class-methods-use-this
   asReduxAction() {
     return {};
   }
@@ -147,6 +149,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   /**
    * @override
    */
+  // eslint-disable-next-line class-methods-use-this
   requestActionTypePrefix() {
     return 'READ';
   }

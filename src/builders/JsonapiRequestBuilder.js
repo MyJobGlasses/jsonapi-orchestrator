@@ -72,7 +72,9 @@ export default class JsonapiRequestBuilder {
    * @return {function} Promise reject callback
    */
   asReduxAction() {
-    if (!this.resource) { throw new Error('This request needs a resource') }
+    if (!this.resource) {
+      throw new Error('This request needs a resource');
+    }
     this.ensureReadyToPerform();
     return ({
       type: requestActionType(

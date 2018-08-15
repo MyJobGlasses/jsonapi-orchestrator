@@ -114,7 +114,7 @@ describe('JsonapiRequestBuilder', () => {
               clientId: '0ff1ce',
             },
           });
-          resource = conversationResource
+          resource = conversationResource;
           conversationResource.sidepost('messages', [messageResource]);
           requestBuilder = new JsonapiRequestBuilder({
             resource: conversationResource, path: '/conversations',

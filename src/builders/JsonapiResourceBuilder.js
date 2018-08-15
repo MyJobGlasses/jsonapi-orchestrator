@@ -1,12 +1,12 @@
-import { merge } from 'lodash';
-
 export default class JsonapiResourceBuilder {
+  /**
+   * @param  {String} options.jsonapiType - json:api document type
+   * @param  {Object} options.meta - Meta relevant for json:api orchestrator
+   * @param  {Object} params - Additional params relevant to the resource
+   */
   constructor({ jsonapiType = null, meta = {}, params = {} }) {
     this.jsonapiType = jsonapiType;
-    this.meta = meta;
     this.params = params;
+    this.meta = meta;
   }
-
-  /* merges additional resource meta */
-  addMeta(meta) { this.meta = merge(this.meta, meta); }
 }

@@ -3,16 +3,29 @@ import {
   isObject, isArray, isString, isBoolean,
   omit,
   forOwn,
-  clone
+  clone,
 } from 'lodash';
 
+/**
+ * Raise meaningful errors in case the construction of the jsonapi is incomplete
+ * and prevents the generation of the requestActionType for redux
+ *
+ * @param  {[type]} typePrefix  [description]
+ * @param  {[type]} jsonapiType [description]
+ * @return {[type]}             [description]
+ */
 export const requestActionType = (typePrefix, jsonapiType) => {
-  if (!typePrefix) { throw new Error('You need to set the action type (Create, update, etc.) of your resource !'); }
-  if (!jsonapiType) { throw new Error('You need to set the jsonapiType of your resource !'); }
+  if (!typePrefix) {
+    throw new Error('You need to set the action type (Create, update, etc.) of your resource !');
+  }
+  if (!jsonapiType) {
+    throw new Error('You need to set the jsonapiType of your resource !');
+  }
   return `${typePrefix.toUpperCase()}_${jsonapiType.toUpperCase()}_RESOURCE`;
 };
 
-/* Resolve path dulications of sideloadings,
+/**
+ * Resolve path dulications of sideloadings,
  * and make an array that is very easy to merge for json:api compliance
  *
  * @param { Object } startingSideloadPath - Current path to start from
@@ -44,8 +57,9 @@ export const splatSideloads = (startingSideloadPath = '', nestedSideloads = {}) 
   return flatten(currentSideloads);
 };
 
-/* Resolve path dulications of filters,
-* and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
+/**
+ * Resolve path dulications of filters,
+ * and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
  *
  * @param { Object } startingFilterPath - Current path to start from
  * @param { Object } nestedFilters - nested filters to merge
@@ -90,7 +104,8 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
   return currentFilters;
 };
 
-/* Assemble sorting paths,
+/**
+ * Assemble sorting paths,
  * and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
  *
  * @param { Array<Object> } sortings - List of sorting hashes
@@ -117,7 +132,8 @@ export const splatSortings = sortings => sortings.map((sorting) => {
   throw new Error(`Sorting only accepts nested objects with ending values being strings 'asc' or 'desc', but received ${currentSortValueOrObject}`);
 });
 
-/* @private
+/**
+ * @private
  *
  * Replace placeholder params in URLs
  *
@@ -137,20 +153,21 @@ const replaceUrlPlaceholders = (url, params) => {
     const placeholder = `:${key}`;
     if (mappedRoute.indexOf(placeholder) !== -1) {
       mappedRoute = mappedRoute.replace(placeholder, value.toString());
-      replacedParams.push(key)
+      replacedParams.push(key);
     }
   });
   return { url: mappedRoute, replacedParams };
 };
 
-/* @private
+/**
+ * @private
  *
  * Merge params in URL params
  *
  * @example
  *
  *   mergeParamsInUrlParams('/conversation/:id?param1=1&param2=2', { param2: 2bis, param3: 3 })
- *     # => '/conversation/:id?param1=1&param2=2bis&param3=3'
+ *   # => '/conversation/:id?param1=1&param2=2bis&param3=3'
  *
  */
 const mergeParamsInUrlParams = (url, params) => {
@@ -158,17 +175,19 @@ const mergeParamsInUrlParams = (url, params) => {
   // TODO: @Dima polyfill URLSearchParams
   const paramsManager = new URLSearchParams(originalSearchParams);
   Object.keys(params).forEach(k => paramsManager.set(k, params[k]));
-  const hasNoParams = paramsManager.keys().next().done
+  const hasNoParams = paramsManager.keys().next().done;
   if (originalSearchParams) {
     return url.replace(`?${originalSearchParams}`, `?${paramsManager.toString()}`);
   } else if (hasNoParams) {
     return url;
-  } else {
-    return `${url}?${paramsManager.toString()}`;
   }
+  return `${url}?${paramsManager.toString()}`;
 };
 
-/*
+/**
+ * Replace URL placeholders by params when or available,
+ * and add unmerged params as regular URL params
+ *
  * @example
  *
  *   mergeParamsInUrlParams(
@@ -177,6 +196,9 @@ const mergeParamsInUrlParams = (url, params) => {
  *   )
  *   # => '/conversation/cafebabe?param1=1&param2=2bis&param3=3'
  *
+ * @param {String} originalUrl
+ * @param {Object} params
+ * @return {String}
  */
 export const mergeParamsInUrlPlaceholdersAndParams = (originalUrl, params) => {
   const { url, replacedParams } = replaceUrlPlaceholders(originalUrl, params);
