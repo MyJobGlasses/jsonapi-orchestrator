@@ -4,7 +4,7 @@
   "description": "Jsonapi powered framework to harness the power of jsonapi with redux",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --notify --watch"
   },
   "repository": {
     "type": "git",
@@ -21,12 +21,27 @@
   },
   "homepage": "https://github.com/MyJobGlasses/jsonapi-orchestrator#readme",
   "dependencies": {
+    "json-api-normalizer": "^0.4.10",
+    "lodash": "^4.17.10",
     "redux": "^3.7.2",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.6",
+    "babel-jest": "^22.4.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.9.0"
+    "eslint-plugin-import": "^2.11.0",
+    "flow-bin": "^0.71.0",
+    "jest": "^22.4.3",
+    "jest-junit": "^4.0.0",
+    "redux-saga-test-plan": "^3.6.0",
+    "regenerator-runtime": "^0.11.1"
   }
 }

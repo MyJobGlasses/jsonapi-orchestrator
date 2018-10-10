@@ -38,10 +38,10 @@ function * initEmployeePageView() {
     method: 'GET',
     path: '/employee/profile/:id',
     params: { id: employeeId } // Should be smart substituted
-    api: APIs.HERMES // Helps set the base URL
+    api: APIs.EMPLOYEE_API // Helps set the base URL
   })
 
-  yield put(requestBuilder.action)
+  yield put(requestBuilder.asReduxAction())
   return yield race({
     success: take(READ_EMPLOYEE_RESOURCE_SUCCESS),
     error: take(READ_EMPLOYEE_RESOURCE_ERROR),
@@ -54,9 +54,7 @@ function * initEmployeePageView() {
  */
 
 function * initConversationsPageView() {
-  conversationsReader = new JsonapiResourceListReader({
-    type: 'messaging/conversation',
-  })
+  conversationsReader = new JsonapiResourceListReader({ type: 'messaging/conversation' })
 
   /* Data expiration
    * On READ Lists, it should generate an index whose ID is a hash of
@@ -82,10 +80,10 @@ function * initConversationsPageView() {
     resource: conversationsReader,
     method: 'GET',
     path: '/conversations',
-    api: APIs.HERMES
+    api: APIs.CONVERSATIONS_API_V1
   })
 
-  yield put(requestBuilder.action)
+  yield put(requestBuilder.asReduxAction())
   return yield race({
     success: take(READ_CONVERSATION_RESOURCE_LIST_SUCCESS),
     error: take(READ_CONVERSATION_RESOURCE_LIST_ERROR),
@@ -107,7 +105,7 @@ function* createProfessional(action) {
 
   // Build the resource from the action / form
   employeeWriter = new JsonapiResourceWriter({ type: 'employee/profile' })
-  resourceBuilder.setAttributes(...action.attributes)
+  resourceBuilder.setAttributes(...asReduxAction.attributes)
 
   // Sidepost the user
   userBuilder = new JsonapiResourceWriter({ type: 'user', id: '', attributes: currentUser.attributes })
@@ -123,13 +121,13 @@ function* createProfessional(action) {
   requestBuilder = new JsonapiRequestBuilder({
     builder: employeeWriter,
     method: 'POST',
-    api: process.env.HERMES_API_URL,
+    api: APIs.EMPLOYEE_API,
     attributes: existingEmployee.attributes
   })
   requestBuilder.endpointPath = '/employee/profile'
   requestBuilder.addMeta({ invitation_token: invitation_token }) // SHould merge with existing metas
 
-  yield put(requestBuilder.action)
+  yield put(requestBuilder.asReduxAction())
   return yield race({
     success: take(WRITE_EMPLOYEE_RESOURCE_SUCCESS),
     error: take(WRITE_EMPLOYEE_RESOURCE_ERROR),
