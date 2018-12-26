@@ -2,7 +2,7 @@ import reducer from './reducer';
 import API from './api';
 import builders from './builders';
 
-export default {
+export {
   reducer,
   API,
   builders,
