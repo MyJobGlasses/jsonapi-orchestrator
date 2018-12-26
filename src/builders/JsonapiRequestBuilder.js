@@ -17,6 +17,7 @@ export default class JsonapiRequestBuilder {
   constructor({
     resource = null,
     httpMethod = null,
+    httpHeaders = {},
     path = '',
     params = {},
     api = null,
@@ -24,6 +25,7 @@ export default class JsonapiRequestBuilder {
   }) {
     this.resource = resource;
     this._httpMethod = httpMethod;
+    this._httpHeaders = httpHeaders;
     this.path = path;
     this.params = params;
     this.api = api;
@@ -129,6 +131,20 @@ export default class JsonapiRequestBuilder {
   }
 
   /**
+   * @return {String} supplied or inferred httpMethod
+   */
+  get httpHeaders() {
+    return this._httpHeaders;
+  }
+
+  /**
+   * @param {String} httpMethod, capital case
+   */
+  set httpHeaders(httpHeaders) {
+    this._httpHeaders = httpHeaders;
+  }
+
+  /**
    * Infer the HTTP Method for this request, based on the supplied resource
    *
    * @return {String}
@@ -152,7 +168,9 @@ export default class JsonapiRequestBuilder {
     if (!this.httpMethod) { throw new Error('HTTP Method cannot be inferred, please supply it'); }
   }
 
-  /* Return a compiled URL with placeholders replaced and params merged
+  /**
+   * Return a compiled URL with placeholders replaced and params merged
+   * Can be used as fetch URL
    * @example
    *
    *   JsonapiRequestBuilder.new(
@@ -168,5 +186,20 @@ export default class JsonapiRequestBuilder {
       return this.api.url + mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
     }
     return mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
+  }
+
+  /**
+   * Return
+   * @return {Object}
+   */
+  fetchOptions() {
+    return ({
+      method: this.httpMethod,
+      headers: {
+        ...(this.api ? this.api.headers : {}),
+        ...this.httpHeaders,
+      },
+      ...this.resource.fetchOptions,
+    });
   }
 }

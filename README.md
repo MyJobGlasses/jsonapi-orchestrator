@@ -35,7 +35,7 @@ Apart from the basic Json:api specification, we aim to support interesting exten
 
 ## Building json:api Requests
 
-A json:api request can be categorized either as a READ request (GET request) or a WRITE request (POST/PATCH/PUT). At this point we're not sure how we want to perform DELETEs
+A json:api request can be categorized either as a READ request (GET request) or a WRITE request (POST/PATCH/PUT). At this point we're not sure how we want to perform DELETEs.
 
 Building those requests can be difficult because of the format of filters, sorting, and includes, in addition to specifying the endpoint. In addition, if you ever want to handle caching of requests, you would need to be ablte to specify metadata such as data freshness to decide later if you actually want to fire the query or reuse existing data already fetched.
 

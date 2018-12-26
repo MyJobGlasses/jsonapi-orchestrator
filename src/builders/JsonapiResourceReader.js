@@ -147,6 +147,14 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
   /**
+   * Return options to be added to fetch
+   * @return {Object}
+   */
+  fetchOptions() {
+    return ({ params: this.paramsAsObject });
+  }
+
+  /**
    * @override
    */
   // eslint-disable-next-line class-methods-use-this
