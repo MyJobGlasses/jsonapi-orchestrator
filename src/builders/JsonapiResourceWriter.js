@@ -55,10 +55,10 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
    */
   fetchOptions() {
     return ({
-      body: {
+      body: JSON.stringify({
         data: this.asJsonapiDataJson(),
         included: this.jsonapiJsonForIncluded(),
-      },
+      }),
     });
   }
 

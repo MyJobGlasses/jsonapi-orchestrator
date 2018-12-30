@@ -164,7 +164,9 @@ describe('JsonapiRequestBuilder', () => {
         });
 
         test('returns correct fetch options', () => {
-          expect(requestBuilder.fetchOptions()).toMatchObject({
+          const fetchOptions = requestBuilder.fetchOptions()
+          fetchOptions.body = JSON.parse(fetchOptions.body)
+          expect(fetchOptions).toMatchObject({
             method: 'POST',
             headers: {},
             body: {
@@ -204,6 +206,12 @@ describe('JsonapiRequestBuilder', () => {
               recipient: 'deadbeef',
             },
           });
+          // Sidepost the Tag
+          const tagBuilder = new JsonapiResourceWriter({
+            jsonapiType: 'tag',
+            id: 'dadbudd',
+          });
+          conversationResource.disassociate('tags', [tagBuilder]);
           resource = conversationResource;
           requestBuilder = new JsonapiRequestBuilder({
             resource: conversationResource,
@@ -223,7 +231,9 @@ describe('JsonapiRequestBuilder', () => {
         });
 
         test('returns correct fetch options', () => {
-          expect(requestBuilder.fetchOptions()).toMatchObject({
+          const fetchOptions = requestBuilder.fetchOptions()
+          fetchOptions.body = JSON.parse(fetchOptions.body)
+          expect(fetchOptions).toMatchObject({
             method: 'PATCH',
             headers: {},
             body: {
@@ -231,6 +241,15 @@ describe('JsonapiRequestBuilder', () => {
                 id: 'faceb00k',
                 type: 'conversation',
                 attributes: { recipient: 'deadbeef' },
+                relationships: {
+                  tags: {
+                    data: [{
+                      id: 'dadbudd',
+                      type: 'tag',
+                      method: 'disassociate',
+                    }]
+                  },
+                },
               },
             },
           });
