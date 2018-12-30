@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-orchestrator",
-  "version": "0.0.5",
+  "version": "0.0.9-d",
   "description": "Jsonapi powered framework to harness the power of jsonapi with redux",
   "main": "./index.js",
   "scripts": {
