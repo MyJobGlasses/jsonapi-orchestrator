@@ -112,7 +112,7 @@ describe('JsonapiRequestBuilder', () => {
         });
       });
 
-      describe('building a write request', () => {
+      describe('building a write#create request', () => {
         beforeEach(() => {
           const conversationResource = new JsonapiResourceWriter({
             jsonapiType: 'conversation',
@@ -131,11 +131,12 @@ describe('JsonapiRequestBuilder', () => {
           resource = conversationResource;
           conversationResource.sidepost('messages', [messageResource]);
           requestBuilder = new JsonapiRequestBuilder({
-            resource: conversationResource, path: '/conversations',
+            resource: conversationResource,
+            path: '/conversations',
           });
         });
 
-        test('returns a correct write action', () => {
+        test('returns a correct write redux action', () => {
           expect(requestBuilder.asReduxAction()).toMatchObject({
             type: 'CREATE_CONVERSATION_RESOURCE',
             data: {
@@ -159,6 +160,79 @@ describe('JsonapiRequestBuilder', () => {
                 clientId: '0ff1ce',
               },
             }],
+          });
+        });
+
+        test('returns correct fetch options', () => {
+          expect(requestBuilder.fetchOptions()).toMatchObject({
+            method: 'POST',
+            headers: {},
+            body: {
+              data: {
+                type: 'conversation',
+                attributes: { recipient: 'deadbeef' },
+                relationships: {
+                  messages: {
+                    data: [{
+                      type: 'message',
+                      method: 'create',
+                      'temp-id': expect.any(String),
+                    }],
+                  },
+                },
+              },
+              included: [{
+                type: 'message',
+                'temp-id': expect.any(String),
+                attributes: {
+                  text: 'Hello world !',
+                  clientId: '0ff1ce',
+                },
+              }],
+            },
+          });
+        });
+      });
+
+      describe('building a write#update request', () => {
+        beforeEach(() => {
+          const conversationResource = new JsonapiResourceWriter({
+            id: 'faceb00k',
+            jsonapiType: 'conversation',
+            params: { userid: 'cafebabe' },
+            attributes: {
+              recipient: 'deadbeef',
+            },
+          });
+          resource = conversationResource;
+          requestBuilder = new JsonapiRequestBuilder({
+            resource: conversationResource,
+            path: '/conversations',
+          });
+        });
+
+        test('returns a correct write redux action', () => {
+          expect(requestBuilder.asReduxAction()).toMatchObject({
+            type: 'UPDATE_CONVERSATION_RESOURCE',
+            data: {
+              id: 'faceb00k',
+              type: 'conversation',
+              attributes: { recipient: 'deadbeef' },
+            },
+          });
+        });
+
+        test('returns correct fetch options', () => {
+          expect(requestBuilder.fetchOptions()).toMatchObject({
+            method: 'PATCH',
+            headers: {},
+            body: {
+              data: {
+                id: 'faceb00k',
+                type: 'conversation',
+                attributes: { recipient: 'deadbeef' },
+              },
+            },
           });
         });
       });

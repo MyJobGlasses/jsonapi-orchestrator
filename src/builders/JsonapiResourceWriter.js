@@ -198,6 +198,10 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
     return this.inferMethod() === 'create' ? 'CREATE' : 'UPDATE';
   }
 
+  httpMethod() {
+    return this.inferMethod() === 'create' ? 'POST' : 'PATCH';
+  }
+
   /**
    * Setter for the persistence method
    * (supported by jsonapi_suite: create/update/associate/disassociate)

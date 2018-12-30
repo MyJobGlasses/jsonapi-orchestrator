@@ -151,7 +151,7 @@ export default class JsonapiRequestBuilder {
    */
   inferHttpMethod() {
     if (this.resource instanceof JsonapiResourceWriter) {
-      return this.resource.method === 'update' ? 'PATCH' : 'POST';
+      return this.resource.httpMethod();
     } else if (this.resource instanceof JsonapiResourceReader) {
       return 'GET';
     }
@@ -206,7 +206,7 @@ export default class JsonapiRequestBuilder {
         ...(this.api ? this.api.headers : {}),
         ...this.httpHeaders,
       },
-      ...this.resource.fetchOptions,
+      ...this.resource.fetchOptions(),
     });
   }
 }
