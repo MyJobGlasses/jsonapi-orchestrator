@@ -78,6 +78,20 @@ describe('JsonapiRequestBuilder', () => {
             meta: {},
           });
         });
+
+        describe('when the reader requests sideloads and sortings', () => {
+          beforeEach(() => {
+            resource.sideload({ tags: true })
+            resource.sort({ created_at: 'desc' })
+          })
+          test('contains json:api read relevant get params', () => {
+            expect(requestBuilder.asReduxAction()).toMatchObject({
+              type: 'READ_CONVERSATION_RESOURCE',
+              url: 'https://conversation.example.com/conversations/cafebabe?sort=-created_at&include=tags',
+              meta: {},
+            });
+          });
+        });
       });
 
       describe('building a document collection read request', () => {

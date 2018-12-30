@@ -1,6 +1,6 @@
 import reducer from './reducer';
 import API from './api';
-import builders from './builders';
+import * as builders from './builders/';
 
 export {
   reducer,

@@ -183,9 +183,16 @@ export default class JsonapiRequestBuilder {
    */
   compileUrl() {
     if (this.api) {
-      return this.api.url + mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
+      return this.api.url + mergeParamsInUrlPlaceholdersAndParams(this.path, this.urlParams());
     }
-    return mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
+    return mergeParamsInUrlPlaceholdersAndParams(this.path, this.urlParams());
+  }
+
+  urlParams() {
+    if (this.resource) {
+      return { ...this.params, ...this.resource.urlParams() }
+    } else
+    return this.params
   }
 
   /**

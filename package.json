@@ -1,12 +1,16 @@
 {
   "name": "jsonapi-orchestrator",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Jsonapi powered framework to harness the power of jsonapi with redux",
-  "main": "dist/src/index.js",
+  "main": "./index.js",
   "scripts": {
+    "start": "yarn build && node ./dist/index.js",
     "test": "jest --notify --watch",
-    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./examples,./src/__tests__,./sample --copy-files",
-    "start": "yarn build && node dist/index.js"
+    "release": "yarn build && yarn publish dist/",
+    "build": "yarn clean-dist && yarn build-dist && yarn copy-package",
+    "clean-dist": "node_modules/.bin/rimraf ./dist",
+    "build-dist": "babel src --out-dir dist --ignore */__tests__",
+    "copy-package": "cp -rf package.json dist"
   },
   "repository": {
     "type": "git",
@@ -23,6 +27,7 @@
   },
   "homepage": "https://github.com/MyJobGlasses/jsonapi-orchestrator#readme",
   "dependencies": {
+    "@babel/runtime": "^7.2.0",
     "json-api-normalizer": "^0.4.10",
     "lodash": "^4.17.10",
     "redux": "^3.7.2",
@@ -30,17 +35,15 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.6",
-    "babel-jest": "^22.4.3",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-flow": "^6.23.0",
-    "babel-preset-stage-0": "^6.24.1",
-    "babel-runtime": "^6.26.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "babel-plugin-console-source": "^2.0.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",

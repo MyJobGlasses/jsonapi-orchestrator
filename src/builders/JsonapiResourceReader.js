@@ -1,4 +1,4 @@
-import { merge, isEmpty } from 'lodash';
+import { merge, isEmpty, omitBy, isNil } from 'lodash';
 
 import JsonapiResourceBuilder from './JsonapiResourceBuilder';
 import { splatSideloads, splatSortings, splatFilters } from '../utils/builders';
@@ -148,10 +148,21 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
 
   /**
    * Return options to be added to fetch
+   * NOTE : some fetch implementations like node-fetch
+   * DO NOT add fetchOptions.params to the URL
+   * So make sure to use .urlParams from the requestBuilder
    * @return {Object}
    */
   fetchOptions() {
     return ({ params: this.paramsAsObject });
+  }
+
+  /**
+   * Reads should add basically all params in the URL
+   * @return {Object}
+   */
+  urlParams() {
+    return omitBy(this.paramsAsObject(), (i) => !i);
   }
 
   /**
