@@ -203,6 +203,8 @@ export default class JsonapiRequestBuilder {
     return ({
       method: this.httpMethod,
       headers: {
+        'Accept': 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
         ...(this.api ? this.api.headers : {}),
         ...this.httpHeaders,
       },

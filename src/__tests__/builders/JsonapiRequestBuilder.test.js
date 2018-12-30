@@ -71,11 +71,20 @@ describe('JsonapiRequestBuilder', () => {
           });
         });
 
-        test('returns a correct read action', () => {
+        test('returns a correct redux read action', () => {
           expect(requestBuilder.asReduxAction()).toMatchObject({
             type: 'READ_CONVERSATION_RESOURCE',
             url: 'https://conversation.example.com/conversations/cafebabe',
             meta: {},
+          });
+        });
+
+        test('returns correct read fetch options', () => {
+          expect(requestBuilder.fetchOptions()).toMatchObject({
+            method: 'GET',
+            headers: {
+              'Accept': 'application/vnd.api+json',
+            },
           });
         });
 
@@ -168,7 +177,10 @@ describe('JsonapiRequestBuilder', () => {
           fetchOptions.body = JSON.parse(fetchOptions.body)
           expect(fetchOptions).toMatchObject({
             method: 'POST',
-            headers: {},
+            headers: {
+              'Accept': 'application/vnd.api+json',
+              'Content-Type': 'application/vnd.api+json',
+            },
             body: {
               data: {
                 type: 'conversation',
