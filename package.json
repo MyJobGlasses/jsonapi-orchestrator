@@ -6,7 +6,7 @@
   "scripts": {
     "start": "yarn build && node ./dist/index.js",
     "test": "jest --notify --watch",
-    "release": "yarn build && yarn publish -f dist/",
+    "release": "yarn build && yarn publish dist/",
     "build": "yarn clean-dist && yarn build-dist && yarn copy-package",
     "clean-dist": "node_modules/.bin/rimraf ./dist",
     "build-dist": "babel src --out-dir dist --ignore */__tests__",
