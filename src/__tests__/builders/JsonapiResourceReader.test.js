@@ -11,6 +11,7 @@ describe('JsonapiResourceReader', () => {
         sideloads: { messages: true },
         sortings: { messages: { created_at: 'asc' } },
         filters: { messages: { acknowledged: [true] } },
+        page: { size: 10, number: 2 },
         dataMustBeFresherThan: freshness,
       });
 
@@ -20,6 +21,7 @@ describe('JsonapiResourceReader', () => {
       expect(instance.sortings).toEqual(expect.objectContaining({ messages: { created_at: 'asc' } }));
       expect(instance.filters)
         .toEqual(expect.objectContaining({ messages: { acknowledged: [true] } }));
+      expect(instance.paginationFilters).toEqual(expect.objectContaining({ size: 10, number: 2 }));
     });
   });
 
@@ -108,16 +110,32 @@ describe('JsonapiResourceReader', () => {
       });
     });
 
+    describe('pagination', () => {
+      describe('adds pagination filters for the request', () => {
+        test('handles merging multiple pagination filters', () => {
+          instance.page({ size: 100, number: 2 });
+          instance.page({ number: 3 });
+          expect(instance.mapOfPaginationFilters()).toMatchObject({
+            'page[size]': 100,
+            'page[number]': 3,
+          });
+        });
+      });
+    });
+
     describe('parameterization', () => {
       test('aggregates all params for a request', () => {
         instance.sideload({ school: true });
         instance.filter({ companyname: ['airfrance', 'axa'] });
         instance.sort({ companyname: 'desc' });
+        instance.page({ size: 10, number: 5 });
 
         expect(instance.paramsAsObject()).toMatchObject({
           sort: '-companyname',
           'filter[companyname]': 'airfrance,axa',
           include: 'school',
+          'page[size]': 10,
+          'page[number]': 5,
         });
       });
     });
