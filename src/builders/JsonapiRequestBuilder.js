@@ -188,11 +188,15 @@ export default class JsonapiRequestBuilder {
     return mergeParamsInUrlPlaceholdersAndParams(this.path, this.urlParams());
   }
 
+  /**
+   * @return {Object} List of URL parameters
+   */
   urlParams() {
     if (this.resource) {
       return { ...this.params, ...this.resource.urlParams() }
-    } else
-    return this.params
+    } else {
+      return this.params
+    }
   }
 
   /**
