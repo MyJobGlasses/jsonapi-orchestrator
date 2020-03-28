@@ -203,7 +203,8 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
    /**
-   * @return {String}
+   * @api private
+   * @return {Object[]}
    */
   mapOfPaginationFilters() {
     if (isEmpty(this.paginationFilters)) { return {}; }
