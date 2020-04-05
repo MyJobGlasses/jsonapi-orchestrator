@@ -2,10 +2,10 @@ import {
   JsonapiRequestBuilder, // Request wrapper
   JsonapiResourceReader, // Single READ (show)
   JsonapiResourceListReader, // List READ (index)
-  JsonapiResourceWriter // Single WRITE (post/patch)
-} from '../src/requests/builders'
+  JsonapiResourceWriter, // Single WRITE (post/patch)
+} from '../src/builders';
 
-import { timeOut } from '../utils'
+import { timeOut } from '../utils';
 
 import { APIs } from '../config/' // APIs = { HERMES: { url: https://www.example.com/api/v1/, prefix: 'HERMES' }}
 
@@ -31,13 +31,13 @@ function * initEmployeePageView() {
 
   // Filtering
   employeeReader.filter({ company_name: ['air_france', 'axa'] }) // ?filter[company_name]=air_france,axa
-  employeeReader.filter({ tags: { name: ['it_digital']}, type: ['mentor']) // ?filter[tags][name]=it%2Cdigital&filter[type]=mentor
+  employeeReader.filter({ tags: { name: ['it_digital']}, type: ['mentor'] }) // ?filter[tags][name]=it%2Cdigital&filter[type]=mentor
 
   requestBuilder = new JsonapiRequestBuilder({
     resource: employeeReader,
     method: 'GET',
     path: '/employee/profile/:id',
-    params: { id: employeeId } // Should be smart substituted
+    params: { id: employeeId }, // Should be smart substituted
     api: APIs.EMPLOYEE_API // Helps set the base URL
   })
 
@@ -97,7 +97,7 @@ function * initConversationsPageView() {
  */
 
 function* watchProfessionalCreateSaga(action) {
-  yield takeEvery(requestActionTypes, createProfessional);@
+  yield takeEvery(requestActionTypes, createProfessional);
 }
 
 function* createProfessional(action) {
@@ -109,13 +109,13 @@ function* createProfessional(action) {
 
   // Sidepost the user
   userBuilder = new JsonapiResourceWriter({ type: 'user', id: '', attributes: currentUser.attributes })
-  employeeWriter.sidepost({ relationship: 'user', method: 'update', userBuilder) // Should set relationship one-way
+  employeeWriter.sidepost('user', userBuilder) // Should set relationship one-way
 
   // Sidepost educations
   educationBuilders = action.educations.forEach( (e) => {
     educationWriter = new JsonapiResourceWriter({ type: 'education', attributes: e.attributes })
     // e.method should return 'create' 'update' or 'destroy' or 'disassociate'
-    employeeWriter.sidepost({ relationship: 'educations', method: e.method, educationWriter)
+    employeeWriter.sidepost('educations', educationWriter)
   })
 
   requestBuilder = new JsonapiRequestBuilder({

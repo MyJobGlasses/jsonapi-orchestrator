@@ -1,10 +1,21 @@
 {
   "presets": [
-    "env",
-    "flow"
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current",
+        }
+      }
+    ],
+    "@babel/preset-flow",
   ],
   "plugins": [
-    "transform-runtime",
-    "transform-object-rest-spread"
+    "@babel/plugin-transform-runtime",
+    [
+      "console-source", {
+        "segments": 0
+      }
+    ]
   ]
 }

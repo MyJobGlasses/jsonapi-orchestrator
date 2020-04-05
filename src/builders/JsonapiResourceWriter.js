@@ -39,13 +39,26 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
   }
 
   /*
-   * @return {Object} used for requestisation
+   * @return {Object} used for requestisation with redux
    */
   asReduxAction() {
     return ({
       params: this.params,
       data: this.asJsonapiDataJson(),
       included: this.jsonapiJsonForIncluded(),
+    });
+  }
+
+  /**
+   * Return list of options to add to the fetch call
+   * @return {Object} body for POST request
+   */
+  fetchOptions() {
+    return ({
+      body: JSON.stringify({
+        data: this.asJsonapiDataJson(),
+        included: this.jsonapiJsonForIncluded(),
+      }),
     });
   }
 
@@ -183,6 +196,10 @@ export default class JsonapiResourceWriter extends JsonapiResourceBuilder {
    */
   requestActionTypePrefix() {
     return this.inferMethod() === 'create' ? 'CREATE' : 'UPDATE';
+  }
+
+  httpMethod() {
+    return this.inferMethod() === 'create' ? 'POST' : 'PATCH';
   }
 
   /**

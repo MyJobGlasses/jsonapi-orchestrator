@@ -1,7 +1,8 @@
 export default class Api {
-  constructor({ name = null, url }) {
+  constructor({ name = null, url, headers = {} }) {
     this._name = name;
     this._url = url;
+    this._headers = headers;
   }
 
   /*
@@ -29,4 +30,16 @@ export default class Api {
    * @return {String}
    */
   get name() { return this._name; }
+
+  /**
+   * Set extra headers API. For instance, { 'X-User-Token': 'xxx' }
+   *
+   * @param {Object}
+   */
+  set headers(headers) { this._headers = headers; }
+
+  /**
+   * @return {Object}
+   */
+  get headers() { return this._headers; }
 }

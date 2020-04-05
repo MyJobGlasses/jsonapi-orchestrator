@@ -1,5 +1,9 @@
 import reducer from './reducer';
+import API from './api';
+import * as builders from './builders/';
 
-export default {
+export {
   reducer,
+  API,
+  builders,
 };

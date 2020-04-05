@@ -17,6 +17,7 @@ export default class JsonapiRequestBuilder {
   constructor({
     resource = null,
     httpMethod = null,
+    httpHeaders = {},
     path = '',
     params = {},
     api = null,
@@ -24,6 +25,7 @@ export default class JsonapiRequestBuilder {
   }) {
     this.resource = resource;
     this._httpMethod = httpMethod;
+    this._httpHeaders = httpHeaders;
     this.path = path;
     this.params = params;
     this.api = api;
@@ -129,13 +131,27 @@ export default class JsonapiRequestBuilder {
   }
 
   /**
+   * @return {String} supplied or inferred httpMethod
+   */
+  get httpHeaders() {
+    return this._httpHeaders;
+  }
+
+  /**
+   * @param {String} httpMethod, capital case
+   */
+  set httpHeaders(httpHeaders) {
+    this._httpHeaders = httpHeaders;
+  }
+
+  /**
    * Infer the HTTP Method for this request, based on the supplied resource
    *
    * @return {String}
    */
   inferHttpMethod() {
     if (this.resource instanceof JsonapiResourceWriter) {
-      return this.resource.method === 'update' ? 'PATCH' : 'POST';
+      return this.resource.httpMethod();
     } else if (this.resource instanceof JsonapiResourceReader) {
       return 'GET';
     }
@@ -152,7 +168,9 @@ export default class JsonapiRequestBuilder {
     if (!this.httpMethod) { throw new Error('HTTP Method cannot be inferred, please supply it'); }
   }
 
-  /* Return a compiled URL with placeholders replaced and params merged
+  /**
+   * Return a compiled URL with placeholders replaced and params merged
+   * Can be used as fetch URL
    * @example
    *
    *   JsonapiRequestBuilder.new(
@@ -165,8 +183,36 @@ export default class JsonapiRequestBuilder {
    */
   compileUrl() {
     if (this.api) {
-      return this.api.url + mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
+      return this.api.url + mergeParamsInUrlPlaceholdersAndParams(this.path, this.urlParams());
     }
-    return mergeParamsInUrlPlaceholdersAndParams(this.path, this.params);
+    return mergeParamsInUrlPlaceholdersAndParams(this.path, this.urlParams());
+  }
+
+  /**
+   * @return {Object} List of URL parameters
+   */
+  urlParams() {
+    if (this.resource) {
+      return { ...this.params, ...this.resource.urlParams() }
+    } else {
+      return this.params
+    }
+  }
+
+  /**
+   * Return
+   * @return {Object}
+   */
+  fetchOptions() {
+    return ({
+      method: this.httpMethod,
+      headers: {
+        'Accept': 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+        ...(this.api ? this.api.headers : {}),
+        ...this.httpHeaders,
+      },
+      ...this.resource.fetchOptions(),
+    });
   }
 }

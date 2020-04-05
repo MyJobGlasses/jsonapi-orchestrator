@@ -9,4 +9,12 @@ export default class JsonapiResourceBuilder {
     this.params = params;
     this.meta = meta;
   }
+
+  /**
+   * Override this method if the resource builder should add params to the URL
+   * @return {Object}
+   */
+  urlParams() {
+    return {};
+  }
 }
