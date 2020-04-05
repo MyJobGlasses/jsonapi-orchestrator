@@ -85,6 +85,7 @@ employeeReader = new JsonapiResourceReader({ type: 'employee'})
 employeeReader.sideload({ company: { admins: true } })
 employeeReader.filter({ in_vacation: false })
 employeeReader.sort({ next_holiday_at: 'asc' })
+employeeReader.page({ size: 10, number: 2 })
 
 requestBuilder = new JsonapiRequestBuilder({
   resource: employeeReader,

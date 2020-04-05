@@ -9,6 +9,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
    * @param {Object} args.sideloads See {@link #sideload()}
    * @param {Object[]} args.sortings See {@link #sort()}
    * @param {Object} args.filters See {@link #filter()}
+   * @param {Object} args.page See {@link #page()}
    * @param {Date} args.dataMustBeFresherThan See {@link #dataMustBeFresherThan()}
    */
   constructor(args = {}) {
@@ -18,12 +19,14 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
       sideloads = {},
       sortings = [],
       filters = {},
+      page = {},
       dataMustBeFresherThan = null,
     } = args;
 
     this.sideloads = sideloads;
     this.sortings = sortings; // Ordered array
     this.filters = filters;
+    this.paginationFilters = page;
     this.dataMustBeFresherThan = dataMustBeFresherThan;
   }
 
@@ -104,6 +107,17 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   }
 
   /**
+   * @param {Object} page - List of pagination filters
+   *   - Implementation depends on the server, see https://jsonapi.org/format/#fetching-pagination
+   *
+   * @example page({ size: 100, number: 2 })
+   *
+   */
+  page(pageFilters) {
+    this.paginationFilters = merge(this.paginationFilters, pageFilters);
+  }
+
+  /**
    * Serialize all filters, sortings, params and includes, and make an object from it
    * @return {Object}
    * @return {String} return.sort
@@ -132,6 +146,7 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
     return ({
       sort: this.joinedSortings(),
       include: this.joinedSideloads(),
+      ...this.mapOfPaginationFilters(),
       ...this.mapOfJoinedFilters(),
       ...this.params,
     });
@@ -185,6 +200,18 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
    */
   joinedSortings() {
     return splatSortings(this.sortings).join(',');
+  }
+
+   /**
+   * @api private
+   * @return {Object[]}
+   */
+  mapOfPaginationFilters() {
+    if (isEmpty(this.paginationFilters)) { return {}; }
+
+    return Object.keys(this.paginationFilters).map((nestedKey) => ({
+      [`page[${nestedKey}]`]: this.paginationFilters[nestedKey],
+    }));
   }
 
   /**
