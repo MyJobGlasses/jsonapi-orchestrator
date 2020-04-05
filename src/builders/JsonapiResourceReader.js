@@ -208,11 +208,10 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
    */
   mapOfPaginationFilters() {
     if (isEmpty(this.paginationFilters)) { return {}; }
-    const values = Object.keys(this.paginationFilters).map((nestedKey) => ({
+
+    return Object.keys(this.paginationFilters).map((nestedKey) => ({
       [`page[${nestedKey}]`]: this.paginationFilters[nestedKey],
     }));
-
-    return Object.assign(...values);
   }
 
   /**
