@@ -35,7 +35,6 @@
     "redux-saga": "^0.16.0",
     "uuid": "^3.2.1"
   },
-  "modulePathIgnorePatterns": ["<rootDir>/dist"],
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
