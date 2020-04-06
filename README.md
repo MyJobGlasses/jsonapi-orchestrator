@@ -13,9 +13,7 @@ Jsonapi Orchestrator aims to help you to deal with various stages of json:api ba
 Ever wanted to use...
 - json:api communication with your APIs
 - `fetch`ing json:api resources
-- Redux based storage of resources retrieved from the API
-- (🛠) Side effects with redux-saga posting to your APIs
-- (🛠) Caching expensive requests to alleviate load on your APIs
+- Dispatch redux actions from json:api requests and resource
 - Create/update things in one request (Sidepost)
 - Be more explicit about what you're doing (association/disassociation VS creation/deletion)
 
@@ -23,7 +21,7 @@ Ever wanted to use...
 
 # Features & Compatibility oj Jsonapi Orchestrator
 
-Our version Jsonapi Orchestrator is currently made to work with json:api 1.0
+Our version Jsonapi Orchestrator is currently made to work with json:api 1.0 and node > 12
 
 Apart from the basic Json:api specification, we aim to support interesting extensions (some of which are projected for json:api v1.1)
 
