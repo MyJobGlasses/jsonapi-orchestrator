@@ -14,6 +14,7 @@ describe('JsonapiResourceListReader', () => {
         sideloads: { messages: true },
         sortings: { messages: { created_at: 'asc' } },
         filters: { messages: { acknowledged: [true] } },
+        page: { size: 12, number: 3 },
         dataMustBeFresherThan: freshness,
       });
 
@@ -23,6 +24,7 @@ describe('JsonapiResourceListReader', () => {
       expect(instance.sortings).toEqual(expect.objectContaining({ messages: { created_at: 'asc' } }));
       expect(instance.filters)
         .toEqual(expect.objectContaining({ messages: { acknowledged: [true] } }));
+      expect(instance.paginationFilters).toEqual(expect.objectContaining({ size: 12, number: 3 }));
     });
   });
 });
