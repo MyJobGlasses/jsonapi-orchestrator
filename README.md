@@ -4,7 +4,7 @@ Building better jsonapi-compliant code
 
 [![BCH compliance](https://bettercodehub.com/edge/badge/MyJobGlasses/jsonapi-orchestrator?branch=master)](https://bettercodehub.com/)
 
-[![CircleCI](https://circleci.com/gh/MyJobGlasses/jsonapi-orchestrator.svg?style=svg)](https://circleci.com/gh/MyJobGlasses/jsonapi-orchestrator)
+[![Github Actions tests](https://github.com/MyJobGlasses/jsonapi-orchestrator/workflows/Node.js%20CI/badge.svg)](https://github.com/MyJobGlasses/jsonapi-orchestrator/workflows/)
 
 # Why an orchestrator
 
