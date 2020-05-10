@@ -221,7 +221,10 @@ export default class JsonapiResourceReader extends JsonapiResourceBuilder {
   mapOfJoinedFilters() {
     const mapOfFiltersAsPair = splatFilters('', this.filters)
       .map(([key, values]) => ({
-        [key]: values.map(v => encodeURIComponent(v)).join(','),
+        // Note : how to escpae comma is not currently handled by json:api.
+        // This implementation decides to escape them to their URL encoded value
+        // Feel free to make a PR to allow reconfiguring jsonapi-orchestrator with a custom comma-transform
+        [key]: values.map(v => v.replace(/,/g, '%2C')).join(','),
       }));
     if (isEmpty(mapOfFiltersAsPair)) { return {}; }
 

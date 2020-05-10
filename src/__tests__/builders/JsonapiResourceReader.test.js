@@ -68,13 +68,22 @@ describe('JsonapiResourceReader', () => {
             }));
         });
 
+        test('escapes spaces and handles special characters', () => {
+          // ?filter[company][name]=Dàrk Vadôr, MR & Ms Smith 👌]
+          instance.filter({ company: { name: ['Dàrk Vadôr', 'MR & Ms Smith, 👌'] } });
+          expect(instance.mapOfJoinedFilters())
+            .toEqual(expect.objectContaining({
+              'filter[company][name]': 'Dàrk Vadôr,MR & Ms Smith%2C 👌',
+            }));
+        });
+
         test('handles multiple filters', () => {
           // ?filter[company][name]=airfrance,axa]
           instance.filter({ company: { name: ['air france', 'axa'] } });
           instance.filter({ company: { sector: ['it, digital', 'business'] } });
           expect(instance.mapOfJoinedFilters()).toMatchObject({
-            'filter[company][name]': 'air%20france,axa',
-            'filter[company][sector]': 'it%2C%20digital,business',
+            'filter[company][name]': 'air france,axa',
+            'filter[company][sector]': 'it%2C digital,business',
           });
         });
       });

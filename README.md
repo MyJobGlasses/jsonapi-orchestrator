@@ -162,13 +162,9 @@ return fetch(requestBuilder.compileUrl(), requestBuilder.fetchOptions());
 
 You can find more advanced examples, including redux-saga based examples, [in the /examples folder](./examples/)
 
-## Feeding the json:api responses to your Redux state
+## Notes
 
-TODO by Dimitri
-
-## Handle caching of requests
-
-For a later version of JO
+- The json:api spec does not really specify how to encode commas (for instance in GET filter values), this library currently transforms them to their URLencoded value `%2C`. Feel free to make a PR to make this configurable.
 
 # Credits
 
