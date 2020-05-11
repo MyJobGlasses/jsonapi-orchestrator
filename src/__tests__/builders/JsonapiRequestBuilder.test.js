@@ -46,13 +46,16 @@ describe('JsonapiRequestBuilder', () => {
       beforeEach(() => {
         requestBuilder = new JsonapiRequestBuilder({
           path: 'conversations/:id',
-          params: { id: 'cafebabe', otherURIParam: 'deadbeef' },
+          params: { 
+            id: 'cafebabe', 
+            lost: '4,8,15,16,23 ând\' 42', 
+          },
         });
       });
 
-      test('replaces params appropriately', () => {
+      test('replaces params appropriately, URL encodes them, and transform commas in values', () => {
         expect(requestBuilder.compileUrl())
-          .toBe('conversations/cafebabe?otherURIParam=deadbeef');
+          .toBe('conversations/cafebabe?lost=4%2C8%2C15%2C16%2C23+%C3%A2nd%27+42');
       });
     });
 
@@ -88,15 +91,16 @@ describe('JsonapiRequestBuilder', () => {
           });
         });
 
-        describe('when the reader requests sideloads and sortings', () => {
+        describe('when the reader requests sideloads, sortings and filters, with special chars', () => {
           beforeEach(() => {
             resource.sideload({ tags: true })
             resource.sort({ created_at: 'desc' })
+            resource.filter({ location: '42.12N,12.42W', specialchars: 'Pésky lîttle chârs' })
           })
           test('contains json:api read relevant get params', () => {
             expect(requestBuilder.asReduxAction()).toMatchObject({
               type: 'READ_CONVERSATION_RESOURCE',
-              url: 'https://conversation.example.com/conversations/cafebabe?sort=-created_at&include=tags',
+              url: 'https://conversation.example.com/conversations/cafebabe?sort=-created_at&include=tags&filter%5Blocation%5D=42.12N%252C12.42W&filter%5Bspecialchars%5D=P%C3%A9sky+l%C3%AEttle+ch%C3%A2rs',
               meta: {},
             });
           });
@@ -270,4 +274,3 @@ describe('JsonapiRequestBuilder', () => {
     });
   });
 });
-
