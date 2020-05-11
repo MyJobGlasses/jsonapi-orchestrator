@@ -46,7 +46,10 @@ describe('JsonapiRequestBuilder', () => {
       beforeEach(() => {
         requestBuilder = new JsonapiRequestBuilder({
           path: 'conversations/:id',
-          params: { id: 'cafebabe', lost: '4,8,15,16,23 ând\' 42' },
+          params: { 
+            id: 'cafebabe', 
+            lost: '4,8,15,16,23 ând\' 42', 
+          },
         });
       });
 
@@ -271,4 +274,3 @@ describe('JsonapiRequestBuilder', () => {
     });
   });
 });
-
