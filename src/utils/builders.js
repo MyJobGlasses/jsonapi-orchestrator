@@ -4,6 +4,7 @@ import {
   isArray,
   isString,
   isBoolean,
+  isNumber,
   omit,
   forOwn,
   clone,
@@ -64,17 +65,17 @@ export const splatSideloads = (startingSideloadPath = '', nestedSideloads = {}) 
  * Resolve path dulications of filters,
  * and make an array of filter/value(s) pairs that is very easy to merge for json:api compliance
  *
- * @param { Object } startingFilterPath - Current path to start from
+ * @param { String } startingFilterPath - Current path to start from
  * @param { Object } nestedFilters - nested filters to merge
  * @return { Array } of filter => Array value pair
  *
  * @example
  *   splatFilters('mainProfile.user',
- *     { avatar: [true], firstName: ['Martine', 'Albert'], notifications: { newsletter: true } }
+ *     { avatar: [true], firstName: ['Martine', 'Albert,Marin'], notifications: { newsletter: true } }
  *   )
  *   # => [
  *     ['mainProfile[user][avatar]', [true]],
- *     ['mainProfile[user][firstName]', ['Martine', 'Albert']
+ *     ['mainProfile[user][firstName]', ['Martine', 'Albert%2CMarin']
  *     ['mainProfile[user][notifications][newsletter]', [true]
  *    ]
  */
@@ -93,12 +94,14 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
         .concat(splatFilters(currentFilterPath, currentFilterValue, true));
     } else if (
       isString(currentFilterValue) ||
-      isArray(currentFilterValue) ||
-      isBoolean(currentFilterValue)
+      isBoolean(currentFilterValue) ||
+      isNumber(currentFilterValue)
     ) {
+      currentFilters.push([currentFilterPath, [escapeFilterValue(currentFilterValue)]])
+    } else if (isArray(currentFilterValue)) {
       currentFilters.push([
         currentFilterPath,
-        isArray(currentFilterValue) ? currentFilterValue : [currentFilterValue],
+        currentFilterValue.map( v => escapeFilterValue(v)),
       ]);
     } else {
       throw new Error(`Filtering only accepts nested objects or strings or arrays as Filters, but received ${currentFilterValue}`);
@@ -106,6 +109,16 @@ export const splatFilters = (startingFilterPath = '', nestedFilters = {}) => {
   });
   return currentFilters;
 };
+
+/**
+ * Escape a filter value
+ * Note : the json:api specs do not specify how to escape commas.
+ * This implementation decides to escape them to their URL encoded value
+ * Feel free to make a PR to allow reconfiguring jsonapi-orchestrator with a custom comma-transform
+ * @param  {String,Boolean,Number} value
+ * @return {String} commas escaped as %2C
+ */
+const escapeFilterValue = (value) => value.toString().replace(/,/g, '%2C')
 
 /**
  * Assemble sorting paths,
