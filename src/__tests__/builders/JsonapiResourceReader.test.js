@@ -86,6 +86,15 @@ describe('JsonapiResourceReader', () => {
             'filter[company][sector]': 'it%2C digital,business',
           });
         });
+
+        test('handles non string/object values', () => {
+          instance.filter({ active: true });
+          instance.filter({ geo: [43.50, 75.03] });
+          expect(instance.mapOfJoinedFilters()).toMatchObject({
+            'filter[active]': 'true',
+            'filter[geo]': '43.5,75.03',
+          });
+        });
       });
     });
 
